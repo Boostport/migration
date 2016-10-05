@@ -1,0 +1,22 @@
+services:
+  - id: phoenix
+    image: boostport/hbase-phoenix-all-in-one:1.2.3-4.8.1
+    ports:
+      - "8765"
+
+dev:
+  image: golang:1.7.1-alpine
+  env:
+    PHOENIX_HOST: http://phoenix:8765
+  steps:
+    - type: script
+      name: Set up workspace
+      options:
+        command: mkdir -p "$GOPATH/src/github.com/Boostport" && ln -s /source $GOPATH/src/github.com/Boostport/migration
+
+  reload:
+    - type: script
+      name: Run tests
+      cwd: $GOPATH/src/github.com/Boostport/migration
+      options:
+        command: go test -v $(go list ./... | grep -v /vendor/)
