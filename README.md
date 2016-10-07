@@ -1,5 +1,58 @@
 # Migration
+[![GoDoc](https://godoc.org/github.com/Boostport/migration?status.png)](https://godoc.org/github.com/Boostport/migration)
+[![wercker status](https://app.wercker.com/status/f4ba0d00eb6ed7ef404a11084507e09d/s/master "wercker status")](https://app.wercker.com/project/byKey/f4ba0d00eb6ed7ef404a11084507e09d)
+[![Coverage Status](https://coveralls.io/repos/github/Boostport/migration/badge.svg?branch=master)](https://coveralls.io/github/Boostport/migration?branch=master)
+
 Simple and pragmatic migrations for Go applications.
+
+## Features
+- Super simple driver interface to allow easy implementation for more database/migration drivers.
+- Embeddable migration files.
+- Support for up/down migrations.
+- Atomic migrations (where possible, depending on database support).
+
+## Drivers
+- Apache Phoenix
+
+## Quickstart
+```go
+// Create migration source
+assetMigration := &migration.AssetMigrationSource{
+    Asset:    Asset,
+    AssetDir: AssetDir,
+    Dir:      "test-migrations",
+}
+
+// Create driver
+driver, err := migration.NewPhoenix("http://localhost:8765")
+
+// Run all up migrations
+applied, err := Migrate(driver, assetMigration, migration.Up, 0)
+
+// Remove the last 2 migrations
+applied, err := Migrate(driver, assetMigration, migration.Down, 2)
+```
+
+## Writing migrations
+Writing migrations is extremely simple. Let's say we want to write our first migration to
+initialize the database.
+
+In that case, we would have a file called `1_init.up.sql` containing SQL statements for the
+up migration.
+
+We also create a `1_init.down.sql` file containing SQL statements for the down migration.
+
+## Embedding migration files
+We use [go-bindata](https://github.com/jteeuwen/go-bindata) to embed migration files. In the
+simpliest case, assuming your migration files are in `migrations/`, just run:
+```
+go-bindata -o bindata.go -pkg myapp migrations/
+```
+
+## TODO (Pull requests welcomed!)
+[] Command line program to run migrations
+[] MigrationSource that uses migrations from the local file system
+[] More drivers
 
 ## Why yet another migration library?
 We wanted a migration library with the following features:
