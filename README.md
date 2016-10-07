@@ -50,9 +50,9 @@ go-bindata -o bindata.go -pkg myapp migrations/
 ```
 
 ## TODO (Pull requests welcomed!)
-[] Command line program to run migrations
-[] MigrationSource that uses migrations from the local file system
-[] More drivers
+- [ ] Command line program to run migrations
+- [ ] MigrationSource that uses migrations from the local file system
+- [ ] More drivers
 
 ## Why yet another migration library?
 We wanted a migration library with the following features:
@@ -65,7 +65,7 @@ and [migrate](https://github.com/mattes/migrate/)
 
 `sql-migrate` leans heavily on the [gorp](https://github.com/go-gorp/gorp) ORM library to perform migrations.
 Unfortunately, this means that we were restricted to databases supported by `gorp`. It is easily embeddable in a
-Go app and supports embedding migration files directly into the Go binary. If database was a bit more flexible,
+Go app and supports embedding migration files directly into the Go binary. If database support was a bit more flexible,
 we would have gone with it.
 
 `migrate` is highly extensible, and adding support for another database is extremely trivial. However, due to it using
