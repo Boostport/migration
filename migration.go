@@ -12,10 +12,10 @@ import (
 	"strings"
 )
 
-type MigrationDirection int
+type Direction int
 
 const (
-	Up MigrationDirection = iota
+	Up Direction = iota
 	Down
 )
 
@@ -23,7 +23,7 @@ var numberPrefixRegex = regexp.MustCompile(`^(\d+).*$`)
 
 // Migration represents a migration, containing statements for migrating up and down.
 type Migration struct {
-	Id   string
+	ID   string
 	Up   string
 	Down string
 }
@@ -32,7 +32,7 @@ type Migration struct {
 // work out how to apply the migration.
 type PlannedMigration struct {
 	*Migration
-	Direction MigrationDirection
+	Direction Direction
 }
 
 // Less compares two migrations to determine how they should be ordered.
@@ -45,7 +45,7 @@ func (m Migration) Less(other *Migration) bool {
 	case !m.isNumeric() && other.isNumeric():
 		return false
 	default:
-		return m.Id < other.Id
+		return m.ID < other.ID
 	}
 }
 
@@ -54,7 +54,7 @@ func (m Migration) isNumeric() bool {
 }
 
 func (m Migration) NumberPrefixMatches() []string {
-	return numberPrefixRegex.FindStringSubmatch(m.Id)
+	return numberPrefixRegex.FindStringSubmatch(m.ID)
 }
 
 // VersionInt converts the migration version to an 64-bit integer.
@@ -67,14 +67,14 @@ func (m Migration) VersionInt() int64 {
 	return value
 }
 
-type byId []*Migration
+type byID []*Migration
 
-func (b byId) Len() int           { return len(b) }
-func (b byId) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
-func (b byId) Less(i, j int) bool { return b[i].Less(b[j]) }
+func (b byID) Len() int           { return len(b) }
+func (b byID) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
+func (b byID) Less(i, j int) bool { return b[i].Less(b[j]) }
 
-// MigrationSource is an interface that defines how a source can find and read migration files.
-type MigrationSource interface {
+// Source is an interface that defines how a source can find and read migration files.
+type Source interface {
 	ListMigrationFiles() ([]string, error)
 	GetMigrationFile(file string) (io.Reader, error)
 }
@@ -138,7 +138,7 @@ func (m MemoryMigrationSource) GetMigrationFile(name string) (io.Reader, error) 
 // Migrate runs a migration using a given driver and MigrationSource. The direction defines whether
 // the migration is up or down, and max is the maximum number of migrations to apply. If max is set to 0,
 // then there is no limit on the number of migrations to apply.
-func Migrate(driver Driver, migrations MigrationSource, direction MigrationDirection, max int) (int, error) {
+func Migrate(driver Driver, migrations Source, direction Direction, max int) (int, error) {
 
 	count := 0
 
@@ -163,7 +163,7 @@ func Migrate(driver Driver, migrations MigrationSource, direction MigrationDirec
 		err = driver.Migrate(plannedMigration)
 		if err != nil {
 
-			errorMessage := "Error while running migration " + plannedMigration.Id
+			errorMessage := "Error while running migration " + plannedMigration.ID
 
 			if plannedMigration.Direction == Up {
 				errorMessage += " (up)"
@@ -186,7 +186,7 @@ func Migrate(driver Driver, migrations MigrationSource, direction MigrationDirec
 	return count, nil
 }
 
-func getMigrations(migrations MigrationSource) ([]*Migration, error) {
+func getMigrations(migrations Source) ([]*Migration, error) {
 
 	m := []*Migration{}
 
@@ -211,7 +211,7 @@ func getMigrations(migrations MigrationSource) ([]*Migration, error) {
 
 			if _, ok := tempMigrations[id]; !ok {
 				tempMigrations[id] = &Migration{
-					Id: id,
+					ID: id,
 				}
 			}
 
@@ -239,22 +239,22 @@ func getMigrations(migrations MigrationSource) ([]*Migration, error) {
 		m = append(m, migration)
 	}
 
-	sort.Sort(byId(m))
+	sort.Sort(byID(m))
 
 	return m, nil
 }
 
-func planMigrations(migrations []*Migration, appliedMigrations []string, direction MigrationDirection, max int) []*PlannedMigration {
+func planMigrations(migrations []*Migration, appliedMigrations []string, direction Direction, max int) []*PlannedMigration {
 
 	applied := []*Migration{}
 
 	for _, appliedMigration := range appliedMigrations {
 		applied = append(applied, &Migration{
-			Id: appliedMigration,
+			ID: appliedMigration,
 		})
 	}
 
-	sort.Sort(byId(applied))
+	sort.Sort(byID(applied))
 
 	// Get last migration that was run
 	record := &Migration{}
@@ -263,7 +263,7 @@ func planMigrations(migrations []*Migration, appliedMigrations []string, directi
 		record = applied[len(applied)-1]
 	}
 
-	result := make([]*PlannedMigration, 0)
+	result := []*PlannedMigration{}
 
 	// Add missing migrations up to the last run migration.
 	// This can happen for example when merges happened.
@@ -272,7 +272,7 @@ func planMigrations(migrations []*Migration, appliedMigrations []string, directi
 	}
 
 	// Figure out which migrations to apply
-	toApply := toApply(migrations, record.Id, direction)
+	toApply := toApply(migrations, record.ID, direction)
 	toApplyCount := len(toApply)
 
 	if max > 0 && max < toApplyCount {
@@ -298,13 +298,13 @@ func planMigrations(migrations []*Migration, appliedMigrations []string, directi
 }
 
 // Filter a slice of migrations into ones that should be applied.
-func toApply(migrations []*Migration, current string, direction MigrationDirection) []*Migration {
+func toApply(migrations []*Migration, current string, direction Direction) []*Migration {
 	var index = -1
 
 	if current != "" {
 		for index < len(migrations)-1 {
 			index++
-			if migrations[index].Id == current {
+			if migrations[index].ID == current {
 				break
 			}
 		}
@@ -331,13 +331,13 @@ func toApply(migrations []*Migration, current string, direction MigrationDirecti
 // Get migrations that we need to apply regardless of whether the direction is up or down. This is
 // because there may be migration "holes" due to merges.
 func toCatchup(migrations, existingMigrations []*Migration, lastRun *Migration) []*PlannedMigration {
-	missing := make([]*PlannedMigration, 0)
+	missing := []*PlannedMigration{}
 
 	for _, migration := range migrations {
 		found := false
 
 		for _, existing := range existingMigrations {
-			if existing.Id == migration.Id {
+			if existing.ID == migration.ID {
 				found = true
 				break
 			}

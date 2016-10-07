@@ -47,7 +47,7 @@ func TestPhoenixDriver(t *testing.T) {
 	migrations := []*migration.PlannedMigration{
 		&migration.PlannedMigration{
 			Migration: &migration.Migration{
-				Id: "201610041422_init",
+				ID: "201610041422_init",
 				Up: `CREATE TABLE test_table1 (id integer not null primary key);
 
 				     CREATE TABLE test_table2 (id integer not null primary key)`,
@@ -56,7 +56,7 @@ func TestPhoenixDriver(t *testing.T) {
 		},
 		&migration.PlannedMigration{
 			Migration: &migration.Migration{
-				Id:   "201610041425_drop_unused_table",
+				ID:   "201610041425_drop_unused_table",
 				Up:   "DROP TABLE test_table2",
 				Down: "CREATE TABLE test_table2(id integer not null primary key)",
 			},
@@ -64,7 +64,7 @@ func TestPhoenixDriver(t *testing.T) {
 		},
 		&migration.PlannedMigration{
 			Migration: &migration.Migration{
-				Id: "201610041422_invalid_sql",
+				ID: "201610041422_invalid_sql",
 				Up: "CREATE TABLE test_table3 (some error",
 			},
 			Direction: migration.Up,
@@ -100,13 +100,13 @@ func TestPhoenixDriver(t *testing.T) {
 			t.Errorf("Received an error while inserting into a non-existent table, but it was not a table_undefined error: %s", err)
 		}
 	} else {
-		t.Errorf("Expected an error while inserting into non-existent table, but did not receive any.")
+		t.Error("Expected an error while inserting into non-existent table, but did not receive any.")
 	}
 
 	err = driver.Migrate(migrations[2])
 
 	if err == nil {
-		t.Errorf("Expected an error while executing invalid statement, but did not receive any.")
+		t.Error("Expected an error while executing invalid statement, but did not receive any.")
 	}
 
 	versions, err := driver.Versions()

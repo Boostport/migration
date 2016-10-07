@@ -33,7 +33,7 @@ func (m *mockDriver) Migrate(migration *PlannedMigration) error {
 	versionIndex := -1
 
 	for i, version := range m.applied {
-		if version == migration.Id {
+		if version == migration.ID {
 			versionIndex = i
 			break
 		}
@@ -41,7 +41,7 @@ func (m *mockDriver) Migrate(migration *PlannedMigration) error {
 
 	if migration.Direction == Up {
 		if versionIndex == -1 {
-			m.applied = append(m.applied, migration.Id)
+			m.applied = append(m.applied, migration.ID)
 		}
 	} else {
 		if versionIndex != -1 {
@@ -66,47 +66,47 @@ func TestMigrationSorting(t *testing.T) {
 
 	unsorted := []*Migration{
 		&Migration{
-			Id: "1475461906_remove_name_column",
+			ID: "1475461906_remove_name_column",
 		},
 		&Migration{
-			Id: "1375461906_init",
+			ID: "1375461906_init",
 		},
 		&Migration{
-			Id: "1575461906_remove_users_table",
+			ID: "1575461906_remove_users_table",
 		},
 		&Migration{
-			Id: "1475461916_add_sales_table",
+			ID: "1475461916_add_sales_table",
 		},
 		&Migration{
-			Id: "1475461904442_remove_subscriptions_table",
+			ID: "1475461904442_remove_subscriptions_table",
 		},
 		&Migration{
-			Id: "1475461904_add_last_name_column",
+			ID: "1475461904_add_last_name_column",
 		},
 	}
 
 	sorted := []*Migration{
 		&Migration{
-			Id: "1375461906_init",
+			ID: "1375461906_init",
 		},
 		&Migration{
-			Id: "1475461904_add_last_name_column",
+			ID: "1475461904_add_last_name_column",
 		},
 		&Migration{
-			Id: "1475461906_remove_name_column",
+			ID: "1475461906_remove_name_column",
 		},
 		&Migration{
-			Id: "1475461916_add_sales_table",
+			ID: "1475461916_add_sales_table",
 		},
 		&Migration{
-			Id: "1575461906_remove_users_table",
+			ID: "1575461906_remove_users_table",
 		},
 		&Migration{
-			Id: "1475461904442_remove_subscriptions_table",
+			ID: "1475461904442_remove_subscriptions_table",
 		},
 	}
 
-	sort.Sort(byId(unsorted))
+	sort.Sort(byID(unsorted))
 
 	if !reflect.DeepEqual(unsorted, sorted) {
 		t.Error("Sorted migrations are not in the correct order.")
@@ -117,50 +117,50 @@ func TestMigrationSortingWithNonNumericIds(t *testing.T) {
 
 	unsorted := []*Migration{
 		&Migration{
-			Id: "b_init",
+			ID: "b_init",
 		},
 		&Migration{
-			Id: "a_remove_users_table",
+			ID: "a_remove_users_table",
 		},
 		&Migration{
-			Id: "d_remove_users_table",
+			ID: "d_remove_users_table",
 		},
 		&Migration{
-			Id: "147546_add_sales_table",
+			ID: "147546_add_sales_table",
 		},
 		&Migration{
-			Id: "c_remove_users_table",
+			ID: "c_remove_users_table",
 		},
 		&Migration{
-			Id: "1_remove_name_column",
+			ID: "1_remove_name_column",
 		},
 	}
 
 	sorted := []*Migration{
 		&Migration{
-			Id: "1_remove_name_column",
+			ID: "1_remove_name_column",
 		},
 		&Migration{
-			Id: "147546_add_sales_table",
+			ID: "147546_add_sales_table",
 		},
 		&Migration{
-			Id: "a_remove_users_table",
+			ID: "a_remove_users_table",
 		},
 		&Migration{
-			Id: "b_init",
+			ID: "b_init",
 		},
 		&Migration{
-			Id: "c_remove_users_table",
+			ID: "c_remove_users_table",
 		},
 		&Migration{
-			Id: "d_remove_users_table",
+			ID: "d_remove_users_table",
 		},
 	}
 
-	sort.Sort(byId(unsorted))
+	sort.Sort(byID(unsorted))
 
 	if !reflect.DeepEqual(unsorted, sorted) {
-		t.Errorf("Sorted migrations are not in the correct order.")
+		t.Error("Sorted migrations are not in the correct order.")
 	}
 }
 
@@ -345,7 +345,7 @@ func TestMigrationWithError(t *testing.T) {
 	applied, err := Migrate(driver, memoryMigration, Up, 2)
 
 	if err == nil {
-		t.Errorf("Expected error while running migration, but there was no error")
+		t.Error("Expected error while running migration, but there was no error")
 	}
 
 	if applied != 1 {
@@ -355,7 +355,7 @@ func TestMigrationWithError(t *testing.T) {
 	applied2, err := Migrate(driver, memoryMigration, Down, 1)
 
 	if err == nil {
-		t.Errorf("Expected error while running migration, but there was no error")
+		t.Error("Expected error while running migration, but there was no error")
 	}
 
 	if applied2 != 0 {
