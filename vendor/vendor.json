@@ -3,6 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
+			"path": "appengine/cloudsql",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "JHoRPRXj8gNaEMuB1deDsZxi6y8=",
 			"path": "github.com/Boostport/avatica",
 			"revision": "7e1ec6beb400229dc8ddff505f036c22c2b87dee",
@@ -13,6 +17,12 @@
 			"path": "github.com/Boostport/avatica/message",
 			"revision": "1ccfc5b634deb671a8c6b348ce24bc753aada3af",
 			"revisionTime": "2016-09-30T00:45:20Z"
+		},
+		{
+			"checksumSHA1": "jEXpLrWXoQvH/zk1lW5Si0swr6Y=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "0b58b37b664c21f3010e836f1b931e1d0b0b0685",
+			"revisionTime": "2016-08-02T11:38:42Z"
 		},
 		{
 			"checksumSHA1": "qjr2SKQanbmna221z0Ce2n0hnDE=",

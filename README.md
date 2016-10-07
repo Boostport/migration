@@ -13,6 +13,7 @@ Simple and pragmatic migrations for Go applications.
 
 ## Drivers
 - Apache Phoenix
+- MySQL
 
 ## Quickstart
 ```go

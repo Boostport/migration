@@ -6,7 +6,9 @@ no-response-timeout: 20
 
 services:
   - boostport/hbase-phoenix-all-in-one:1.2.3-4.8.1
-
+  - id: mysql:5
+    env:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
 build:
   steps:
 
@@ -17,6 +19,7 @@ build:
         name: set up environment variables
         code: |
           export PHOENIX_HOST=http://$HBASE_PHOENIX_ALL_IN_ONE_PORT_8765_TCP_ADDR:8765
+          export MYSQL_HOST=$MYSQL_PORT_3306_TCP_ADDR:3306
     - script:
         code: |
           env
