@@ -60,7 +60,6 @@ func (driver *MySQL) Migrate(migration *m.PlannedMigration) error {
 	// Note: MySQL does not support DDL statements in a transaction. If DDL statements are
 	// executed in a transaction, it is an implicit commit.
 	// See: http://dev.mysql.com/doc/refman/5.7/en/implicit-commit.html
-
 	var content string
 
 	if migration.Direction == m.Up {
@@ -88,11 +87,11 @@ func (driver *MySQL) Migrate(migration *m.PlannedMigration) error {
 	}
 
 	if migration.Direction == m.Up {
-		if _, err := driver.db.Exec("INSERT INTO "+mysqlTableName+" (version) VALUES (?)", migration.Id); err != nil {
+		if _, err := driver.db.Exec("INSERT INTO "+mysqlTableName+" (version) VALUES (?)", migration.ID); err != nil {
 			return err
 		}
 	} else {
-		if _, err := driver.db.Exec("DELETE FROM "+mysqlTableName+" WHERE version=?", migration.Id); err != nil {
+		if _, err := driver.db.Exec("DELETE FROM "+mysqlTableName+" WHERE version=?", migration.ID); err != nil {
 			return err
 		}
 	}

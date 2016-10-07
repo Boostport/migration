@@ -86,11 +86,11 @@ func (driver *Phoenix) Migrate(migration *m.PlannedMigration) error {
 	}
 
 	if migration.Direction == m.Up {
-		if _, err := driver.db.Exec("UPSERT INTO "+phoenixTableName+" (version) VALUES (?)", migration.Id); err != nil {
+		if _, err := driver.db.Exec("UPSERT INTO "+phoenixTableName+" (version) VALUES (?)", migration.ID); err != nil {
 			return err
 		}
 	} else {
-		if _, err := driver.db.Exec("DELETE FROM "+phoenixTableName+" WHERE version=?", migration.Id); err != nil {
+		if _, err := driver.db.Exec("DELETE FROM "+phoenixTableName+" WHERE version=?", migration.ID); err != nil {
 			return err
 		}
 	}

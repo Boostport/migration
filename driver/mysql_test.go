@@ -50,7 +50,7 @@ func TestMySQLDriver(t *testing.T) {
 	migrations := []*migration.PlannedMigration{
 		&migration.PlannedMigration{
 			Migration: &migration.Migration{
-				Id: "201610041422_init",
+				ID: "201610041422_init",
 				Up: `CREATE TABLE test_table1 (id integer not null primary key);
 
 				     CREATE TABLE test_table2 (id integer not null primary key)`,
@@ -59,7 +59,7 @@ func TestMySQLDriver(t *testing.T) {
 		},
 		&migration.PlannedMigration{
 			Migration: &migration.Migration{
-				Id:   "201610041425_drop_unused_table",
+				ID:   "201610041425_drop_unused_table",
 				Up:   "DROP TABLE test_table2",
 				Down: "CREATE TABLE test_table2(id integer not null primary key)",
 			},
@@ -67,7 +67,7 @@ func TestMySQLDriver(t *testing.T) {
 		},
 		&migration.PlannedMigration{
 			Migration: &migration.Migration{
-				Id: "201610041422_invalid_sql",
+				ID: "201610041422_invalid_sql",
 				Up: "CREATE TABLE test_table3 (some error",
 			},
 			Direction: migration.Up,
