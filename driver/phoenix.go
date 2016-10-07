@@ -15,6 +15,8 @@ type Phoenix struct {
 
 const tableName = "schema_migration"
 
+// NewPhoenix creates a new Apache Phoenix driver.
+// The DSN is documented here: https://github.com/Boostport/avatica#dsn-data-source-name
 func NewPhoenix(dsn string) (m.Driver, error) {
 
 	db, err := sql.Open("avatica", dsn)
@@ -38,6 +40,7 @@ func NewPhoenix(dsn string) (m.Driver, error) {
 	return p, nil
 }
 
+// Close closes the connection to the Apache Phoenix server.
 func (driver *Phoenix) Close() error {
 
 	if err := driver.db.Close(); err != nil {
@@ -52,6 +55,7 @@ func (driver *Phoenix) ensureVersionTableExists() error {
 	return err
 }
 
+// Migrate runs a migration.
 func (driver *Phoenix) Migrate(migration *m.PlannedMigration) error {
 
 	// TODO: Phoenix does not support DDL statements yet :( See PHOENIX-3358
@@ -95,6 +99,7 @@ func (driver *Phoenix) Migrate(migration *m.PlannedMigration) error {
 	return nil
 }
 
+// Versions lists all the applied versions.
 func (driver *Phoenix) Versions() ([]string, error) {
 	versions := []string{}
 

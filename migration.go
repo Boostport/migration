@@ -21,17 +21,21 @@ const (
 
 var numberPrefixRegex = regexp.MustCompile(`^(\d+).*$`)
 
+// Migration represents a migration, containing statements for migrating up and down.
 type Migration struct {
 	Id   string
 	Up   string
 	Down string
 }
 
+// PlannedMigration is a migration with a direction defined. This allows the driver to
+// work out how to apply the migration.
 type PlannedMigration struct {
 	*Migration
 	Direction MigrationDirection
 }
 
+// Less compares two migrations to determine how they should be ordered.
 func (m Migration) Less(other *Migration) bool {
 	switch {
 	case m.isNumeric() && other.isNumeric() && m.VersionInt() != other.VersionInt():
@@ -53,6 +57,7 @@ func (m Migration) NumberPrefixMatches() []string {
 	return numberPrefixRegex.FindStringSubmatch(m.Id)
 }
 
+// VersionInt converts the migration version to an 64-bit integer.
 func (m Migration) VersionInt() int64 {
 	v := m.NumberPrefixMatches()[1]
 	value, err := strconv.ParseInt(v, 10, 64)
@@ -68,11 +73,13 @@ func (b byId) Len() int           { return len(b) }
 func (b byId) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
 func (b byId) Less(i, j int) bool { return b[i].Less(b[j]) }
 
+// MigrationSource is an interface that defines how a source can find and read migration files.
 type MigrationSource interface {
 	ListMigrationFiles() ([]string, error)
 	GetMigrationFile(file string) (io.Reader, error)
 }
 
+// AssetMigrationSource is a MigrationSource that uses migration files embedded in a Go application.
 type AssetMigrationSource struct {
 	// Asset should return content of file in path if exists
 	Asset func(path string) ([]byte, error)
@@ -100,6 +107,8 @@ func (a AssetMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
 	return bytes.NewReader(file), nil
 }
 
+// MemoryMigrationSource is a MigrationSource that uses migration sources in memory. It is mainly
+// used for testing.
 type MemoryMigrationSource struct {
 	Files map[string]string
 }
@@ -126,6 +135,9 @@ func (m MemoryMigrationSource) GetMigrationFile(name string) (io.Reader, error) 
 	return strings.NewReader(content), nil
 }
 
+// Migrate runs a migration using a given driver and MigrationSource. The direction defines whether
+// the migration is up or down, and max is the maximum number of migrations to apply. If max is set to 0,
+// then there is no limit on the number of migrations to apply.
 func Migrate(driver Driver, migrations MigrationSource, direction MigrationDirection, max int) (int, error) {
 
 	count := 0
@@ -260,7 +272,7 @@ func planMigrations(migrations []*Migration, appliedMigrations []string, directi
 	}
 
 	// Figure out which migrations to apply
-	toApply := ToApply(migrations, record.Id, direction)
+	toApply := toApply(migrations, record.Id, direction)
 	toApplyCount := len(toApply)
 
 	if max > 0 && max < toApplyCount {
@@ -286,7 +298,7 @@ func planMigrations(migrations []*Migration, appliedMigrations []string, directi
 }
 
 // Filter a slice of migrations into ones that should be applied.
-func ToApply(migrations []*Migration, current string, direction MigrationDirection) []*Migration {
+func toApply(migrations []*Migration, current string, direction MigrationDirection) []*Migration {
 	var index = -1
 
 	if current != "" {
@@ -316,6 +328,8 @@ func ToApply(migrations []*Migration, current string, direction MigrationDirecti
 	panic("Not possible")
 }
 
+// Get migrations that we need to apply regardless of whether the direction is up or down. This is
+// because there may be migration "holes" due to merges.
 func toCatchup(migrations, existingMigrations []*Migration, lastRun *Migration) []*PlannedMigration {
 	missing := make([]*PlannedMigration, 0)
 
