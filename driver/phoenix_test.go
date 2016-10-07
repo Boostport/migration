@@ -15,13 +15,13 @@ func TestPhoenixDriver(t *testing.T) {
 	// prepare clean database
 	connection, err := sql.Open("avatica", phoenixHost)
 
-	defer connection.Close()
-
-	schema := "migrationtest"
-
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	defer connection.Close()
+
+	schema := "migrationtest"
 
 	_, err = connection.Exec("CREATE SCHEMA IF NOT EXISTS " + schema)
 
