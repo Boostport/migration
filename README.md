@@ -34,13 +34,27 @@ applied, err := Migrate(driver, assetMigration, migration.Down, 2)
 ```
 
 ## Writing migrations
-Writing migrations is extremely simple. Let's say we want to write our first migration to
-initialize the database.
+Migrations are extremely simple to write:
+- Separate your up and down migrations into different files. For example, `1_init.up.sql` and `1_init.down.sql`.
+- Prefix your migration with a number or timestamp for versioning: `1_init.up.sql` or `1475813115_init.up.sql`.
+- The file-extension can be anything you want, but must be present. For example, `1_init.up.sql` is valid, but
+`1_init.up` is not,
+
+Let's say we want to write our first migration to initialize the database.
 
 In that case, we would have a file called `1_init.up.sql` containing SQL statements for the
-up migration.
+up migration:
 
-We also create a `1_init.down.sql` file containing SQL statements for the down migration.
+```sql
+CREATE TABLE test_data (
+  id BIGINT NOT NULL PRIMARY KEY,
+)
+```
+
+We also create a `1_init.down.sql` file containing SQL statements for the down migration:
+```sql
+DROP TABLE IF EXISTS test_data
+```
 
 ## Embedding migration files
 We use [go-bindata](https://github.com/jteeuwen/go-bindata) to embed migration files. In the
