@@ -14,6 +14,7 @@ Simple and pragmatic migrations for Go applications.
 ## Drivers
 - Apache Phoenix
 - MySQL
+- PostgreSQL
 
 ## Quickstart
 ```go

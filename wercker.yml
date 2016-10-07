@@ -9,6 +9,7 @@ services:
   - id: mysql:5
     env:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
+  - postgres:9
 build:
   steps:
 
@@ -20,6 +21,7 @@ build:
         code: |
           export PHOENIX_HOST=http://$HBASE_PHOENIX_ALL_IN_ONE_PORT_8765_TCP_ADDR:8765
           export MYSQL_HOST=$MYSQL_PORT_3306_TCP_ADDR:3306
+          export POSTGRES_HOST=$POSTGRES_PORT_5432_TCP_ADDR:5432
     - script:
         code: |
           env
