@@ -73,3 +73,6 @@ the scheme in the dsn to determine which database driver to use, it prevented us
 Phoenix driver, which uses the scheme to determine if we should connect over `http` or `https`. Due to the way the
 project is structured, it was also almost impossible to add support for embeddable migration files without major
 changes.
+
+## License
+This library is licensed under the Apache 2 License.
