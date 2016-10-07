@@ -10,11 +10,17 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
     ports:
       - "3306"
+
+  - id: postgres
+    image: postgres:9
+    ports:
+      - "5432"
 dev:
   image: golang:1.7.1-alpine
   env:
     PHOENIX_HOST: http://phoenix:8765
     MYSQL_HOST: mysql:3306
+    POSTGRES_HOST: postgres:5432
   steps:
     - type: script
       name: Set up workspace
