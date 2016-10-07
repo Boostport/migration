@@ -17,11 +17,11 @@ func TestMySQLDriver(t *testing.T) {
 	// prepare clean database
 	connection, err := sql.Open("mysql", "root:@tcp("+mysqlHost+")/")
 
-	defer connection.Close()
-
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	defer connection.Close()
 
 	_, err = connection.Exec("CREATE DATABASE IF NOT EXISTS " + database)
 
