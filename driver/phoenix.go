@@ -1,4 +1,3 @@
-// Package phoenix implements the Driver interface.
 package driver
 
 import (
@@ -13,7 +12,7 @@ type Phoenix struct {
 	db *sql.DB
 }
 
-const tableName = "schema_migration"
+const phoenixTableName = "schema_migration"
 
 // NewPhoenix creates a new Apache Phoenix driver.
 // The DSN is documented here: https://github.com/Boostport/avatica#dsn-data-source-name
@@ -51,7 +50,7 @@ func (driver *Phoenix) Close() error {
 }
 
 func (driver *Phoenix) ensureVersionTableExists() error {
-	_, err := driver.db.Exec("CREATE TABLE IF NOT EXISTS " + tableName + " (version varchar not null primary key) TRANSACTIONAL=true")
+	_, err := driver.db.Exec("CREATE TABLE IF NOT EXISTS " + phoenixTableName + " (version varchar not null primary key) TRANSACTIONAL=true")
 	return err
 }
 
@@ -87,11 +86,11 @@ func (driver *Phoenix) Migrate(migration *m.PlannedMigration) error {
 	}
 
 	if migration.Direction == m.Up {
-		if _, err := driver.db.Exec("UPSERT INTO "+tableName+" (version) VALUES (?)", migration.Id); err != nil {
+		if _, err := driver.db.Exec("UPSERT INTO "+phoenixTableName+" (version) VALUES (?)", migration.Id); err != nil {
 			return err
 		}
 	} else {
-		if _, err := driver.db.Exec("DELETE FROM "+tableName+" WHERE version=?", migration.Id); err != nil {
+		if _, err := driver.db.Exec("DELETE FROM "+phoenixTableName+" WHERE version=?", migration.Id); err != nil {
 			return err
 		}
 	}
@@ -103,7 +102,7 @@ func (driver *Phoenix) Migrate(migration *m.PlannedMigration) error {
 func (driver *Phoenix) Versions() ([]string, error) {
 	versions := []string{}
 
-	rows, err := driver.db.Query("SELECT version FROM " + tableName + " ORDER BY version DESC")
+	rows, err := driver.db.Query("SELECT version FROM " + phoenixTableName + " ORDER BY version DESC")
 
 	if err != nil {
 		return versions, err

@@ -4,10 +4,17 @@ services:
     ports:
       - "8765"
 
+  - id: mysql
+    image: mysql:5
+    env:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    ports:
+      - "3306"
 dev:
   image: golang:1.7.1-alpine
   env:
     PHOENIX_HOST: http://phoenix:8765
+    MYSQL_HOST: mysql:3306
   steps:
     - type: script
       name: Set up workspace
