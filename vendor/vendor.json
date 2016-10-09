@@ -49,6 +49,12 @@
 			"revisionTime": "2016-08-31T22:25:20Z"
 		},
 		{
+			"checksumSHA1": "0YgW0+rmiIzLlvhIKlQ0s0olPg8=",
+			"path": "github.com/mattn/go-sqlite3",
+			"revision": "e5a3c16c5c1d80b24f633e68aecd6b0702786d3d",
+			"revisionTime": "2016-10-04T16:01:36Z"
+		},
+		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
 			"path": "github.com/satori/go.uuid",
 			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",

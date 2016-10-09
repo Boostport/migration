@@ -23,6 +23,11 @@ dev:
     POSTGRES_HOST: postgres:5432
   steps:
     - type: script
+      name: Install build tools
+      options:
+        command: apk --no-cache --no-progress add build-base
+
+    - type: script
       name: Set up workspace
       options:
         command: mkdir -p "$GOPATH/src/github.com/Boostport" && ln -s /source $GOPATH/src/github.com/Boostport/migration
