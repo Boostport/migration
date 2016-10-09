@@ -86,7 +86,7 @@ func (driver *Postgres) Migrate(migration *m.PlannedMigration) error {
 	}
 
 	if migration.Direction == m.Up {
-		if _, err := driver.db.Exec("INSERT INTO "+postgresTableName+" (version) VALUES ($1)", migration.ID); err != nil {
+		if _, err := tx.Exec("INSERT INTO "+postgresTableName+" (version) VALUES ($1)", migration.ID); err != nil {
 
 			if err := tx.Rollback(); err != nil {
 				return err
@@ -95,7 +95,7 @@ func (driver *Postgres) Migrate(migration *m.PlannedMigration) error {
 			return err
 		}
 	} else {
-		if _, err := driver.db.Exec("DELETE FROM "+postgresTableName+" WHERE version=$1", migration.ID); err != nil {
+		if _, err := tx.Exec("DELETE FROM "+postgresTableName+" WHERE version=$1", migration.ID); err != nil {
 
 			if err := tx.Rollback(); err != nil {
 				return err
