@@ -25,6 +25,11 @@ build:
     - script:
         code: |
           env
+    # Set up cgo build tools
+    - script:
+      name: set up cgo build tools
+      code: |
+        apk --no-cache --no-progress add build-base
     # Gets the dependencies
     - script:
       name: go vendor

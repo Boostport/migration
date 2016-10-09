@@ -15,6 +15,7 @@ Simple and pragmatic migrations for Go applications.
 - Apache Phoenix
 - MySQL
 - PostgreSQL
+- SQLite
 
 ## Quickstart
 ```go
