@@ -1,4 +1,4 @@
-package driver
+package sqlite
 
 import (
 	"database/sql"
