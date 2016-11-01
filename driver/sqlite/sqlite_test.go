@@ -1,9 +1,10 @@
 package sqlite
 
 import (
-	"github.com/Boostport/migration"
 	"regexp"
 	"testing"
+
+	"github.com/Boostport/migration"
 )
 
 func TestSQLiteDriver(t *testing.T) {

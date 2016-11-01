@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+
 	m "github.com/Boostport/migration"
 	_ "github.com/lib/pq"
 )
@@ -40,12 +41,8 @@ func NewPostgres(dsn string) (m.Driver, error) {
 
 // Close closes the connection to the Postgres server.
 func (driver *Postgres) Close() error {
-
-	if err := driver.db.Close(); err != nil {
-		return err
-	}
-
-	return nil
+	err := driver.db.Close()
+	return err
 }
 
 func (driver *Postgres) ensureVersionTableExists() error {
@@ -76,9 +73,9 @@ func (driver *Postgres) Migrate(migration *m.PlannedMigration) error {
 		return err
 	}
 
-	if _, err := tx.Exec(content); err != nil {
+	if _, err = tx.Exec(content); err != nil {
 
-		if err := tx.Rollback(); err != nil {
+		if err = tx.Rollback(); err != nil {
 			return err
 		}
 
@@ -86,30 +83,23 @@ func (driver *Postgres) Migrate(migration *m.PlannedMigration) error {
 	}
 
 	if migration.Direction == m.Up {
-		if _, err := tx.Exec("INSERT INTO "+postgresTableName+" (version) VALUES ($1)", migration.ID); err != nil {
+		if _, err = tx.Exec("INSERT INTO "+postgresTableName+" (version) VALUES ($1)", migration.ID); err != nil {
 
-			if err := tx.Rollback(); err != nil {
-				return err
-			}
-
+			err = tx.Rollback()
 			return err
+
 		}
 	} else {
-		if _, err := tx.Exec("DELETE FROM "+postgresTableName+" WHERE version=$1", migration.ID); err != nil {
+		if _, err = tx.Exec("DELETE FROM "+postgresTableName+" WHERE version=$1", migration.ID); err != nil {
 
-			if err := tx.Rollback(); err != nil {
-				return err
-			}
-
+			err = tx.Rollback()
 			return err
+
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-
-	return nil
+	err = tx.Commit()
+	return err
 }
 
 // Versions lists all the applied versions.
@@ -127,7 +117,7 @@ func (driver *Postgres) Versions() ([]string, error) {
 	for rows.Next() {
 		var version string
 
-		err := rows.Scan(&version)
+		err = rows.Scan(&version)
 
 		if err != nil {
 			return versions, err

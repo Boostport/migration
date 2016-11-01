@@ -2,10 +2,11 @@ package postgres
 
 import (
 	"database/sql"
-	"github.com/Boostport/migration"
-	"github.com/lib/pq"
 	"os"
 	"testing"
+
+	"github.com/Boostport/migration"
+	"github.com/lib/pq"
 )
 
 func TestPostgresDriver(t *testing.T) {
@@ -101,7 +102,7 @@ func TestPostgresDriver(t *testing.T) {
 		t.Errorf("Unexpected error while running migration: %s", err)
 	}
 
-	if _, err := connection2.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
+	if _, err = connection2.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
 		if err.(*pq.Error).Code.Name() != "undefined_table" {
 			t.Errorf("Received an error while inserting into a non-existent table, but it was not a undefined_table error: %s", err)
 		}
