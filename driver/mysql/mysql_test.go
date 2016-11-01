@@ -2,10 +2,11 @@ package mysql
 
 import (
 	"database/sql"
-	"github.com/Boostport/migration"
-	"github.com/go-sql-driver/mysql"
 	"os"
 	"testing"
+
+	"github.com/Boostport/migration"
+	"github.com/go-sql-driver/mysql"
 )
 
 func TestMySQLDriver(t *testing.T) {
@@ -98,7 +99,7 @@ func TestMySQLDriver(t *testing.T) {
 		t.Errorf("Unexpected error while running migration: %s", err)
 	}
 
-	if _, err := connection.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
+	if _, err = connection.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
 		if err.(*mysql.MySQLError).Number != 1146 {
 			t.Errorf("Received an error while inserting into a non-existent table, but it was not a table_undefined error: %s", err)
 		}

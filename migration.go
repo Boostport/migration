@@ -158,8 +158,6 @@ func Migrate(driver Driver, migrations Source, direction Direction, max int) (in
 
 	for _, plannedMigration := range migrationsToApply {
 
-		var err error
-
 		err = driver.Migrate(plannedMigration)
 		if err != nil {
 
@@ -178,12 +176,7 @@ func Migrate(driver Driver, migrations Source, direction Direction, max int) (in
 	}
 
 	err = driver.Close()
-
-	if err != nil {
-		return count, err
-	}
-
-	return count, nil
+	return count, err
 }
 
 func getMigrations(migrations Source) ([]*Migration, error) {

@@ -3,9 +3,10 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"strings"
+
 	m "github.com/Boostport/migration"
 	_ "github.com/go-sql-driver/mysql"
-	"strings"
 )
 
 type MySQL struct {
@@ -41,12 +42,8 @@ func NewMySQL(dsn string) (m.Driver, error) {
 
 // Close closes the connection to the MySQL server.
 func (driver *MySQL) Close() error {
-
-	if err := driver.db.Close(); err != nil {
-		return err
-	}
-
-	return nil
+	err := driver.db.Close()
+	return err
 }
 
 func (driver *MySQL) ensureVersionTableExists() error {
@@ -114,7 +111,7 @@ func (driver *MySQL) Versions() ([]string, error) {
 	for rows.Next() {
 		var version string
 
-		err := rows.Scan(&version)
+		err = rows.Scan(&version)
 
 		if err != nil {
 			return versions, err

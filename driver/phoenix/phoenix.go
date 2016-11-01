@@ -3,9 +3,10 @@ package phoenix
 import (
 	"database/sql"
 	"fmt"
+	"strings"
+
 	_ "github.com/Boostport/avatica"
 	m "github.com/Boostport/migration"
-	"strings"
 )
 
 type Phoenix struct {
@@ -41,12 +42,8 @@ func NewPhoenix(dsn string) (m.Driver, error) {
 
 // Close closes the connection to the Apache Phoenix server.
 func (driver *Phoenix) Close() error {
-
-	if err := driver.db.Close(); err != nil {
-		return err
-	}
-
-	return nil
+	err := driver.db.Close()
+	return err
 }
 
 func (driver *Phoenix) ensureVersionTableExists() error {
@@ -113,7 +110,7 @@ func (driver *Phoenix) Versions() ([]string, error) {
 	for rows.Next() {
 		var version string
 
-		err := rows.Scan(&version)
+		err = rows.Scan(&version)
 
 		if err != nil {
 			return versions, err
