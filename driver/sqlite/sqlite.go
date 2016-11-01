@@ -98,7 +98,7 @@ func (driver *SQLite) Migrate(migration *m.PlannedMigration) error {
 		}
 	}
 
-	err := tx.Commit()
+	err = tx.Commit()
 	return err
 }
 
