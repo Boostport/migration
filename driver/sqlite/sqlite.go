@@ -51,7 +51,7 @@ func (driver *SQLite) ensureVersionTableExists() error {
 }
 
 // Migrate runs a migration.
-func (driver *SQLite) Migrate(migration *m.PlannedMigration) error {
+func (driver *SQLite) Migrate(migration *m.PlannedMigration) (err error) {
 
 	// Note: MySQL does not support DDL statements in a transaction. If DDL statements are
 	// executed in a transaction, it is an implicit commit.
@@ -73,11 +73,17 @@ func (driver *SQLite) Migrate(migration *m.PlannedMigration) error {
 		return err
 	}
 
-	if _, err = tx.Exec(content); err != nil {
-
-		if err = tx.Rollback(); err != nil {
-			return err
+	defer func() {
+		if err != nil {
+			if errRb := tx.Rollback(); errRb != nil {
+				err = fmt.Errorf("Error rolling back: %s\n%s", errRb, err)
+			}
+			return
 		}
+		err = tx.Commit()
+	}()
+
+	if _, err = tx.Exec(content); err != nil {
 
 		return fmt.Errorf("Error executing statement: %s\n%s", err, content)
 	}
@@ -85,21 +91,17 @@ func (driver *SQLite) Migrate(migration *m.PlannedMigration) error {
 	if migration.Direction == m.Up {
 		if _, err = tx.Exec("INSERT INTO "+sqliteTableName+" (version) VALUES (?)", migration.ID); err != nil {
 
-			err = tx.Rollback()
-			return err
+			return
 
 		}
 	} else {
 		if _, err = tx.Exec("DELETE FROM "+sqliteTableName+" WHERE version=?", migration.ID); err != nil {
 
-			err = tx.Rollback()
-			return err
+			return
 
 		}
 	}
-
-	err = tx.Commit()
-	return err
+	return
 }
 
 // Versions lists all the applied versions.

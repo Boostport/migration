@@ -51,7 +51,7 @@ func (driver *Postgres) ensureVersionTableExists() error {
 }
 
 // Migrate runs a migration.
-func (driver *Postgres) Migrate(migration *m.PlannedMigration) error {
+func (driver *Postgres) Migrate(migration *m.PlannedMigration) (err error) {
 
 	// Note: MySQL does not support DDL statements in a transaction. If DDL statements are
 	// executed in a transaction, it is an implicit commit.
@@ -73,33 +73,37 @@ func (driver *Postgres) Migrate(migration *m.PlannedMigration) error {
 		return err
 	}
 
+	defer func() {
+		if err != nil {
+			if errRb := tx.Rollback(); errRb != nil {
+				err = fmt.Errorf("Error rolling back: %s\n%s", errRb, err)
+			}
+			return
+		}
+		err = tx.Commit()
+	}()
+
 	if _, err = tx.Exec(content); err != nil {
 
-		if err = tx.Rollback(); err != nil {
-			return err
-		}
+		err = fmt.Errorf("Error executing statement: %s\n%s", err, content)
+		return
 
-		return fmt.Errorf("Error executing statement: %s\n%s", err, content)
 	}
 
 	if migration.Direction == m.Up {
 		if _, err = tx.Exec("INSERT INTO "+postgresTableName+" (version) VALUES ($1)", migration.ID); err != nil {
 
-			err = tx.Rollback()
-			return err
+			return
 
 		}
 	} else {
 		if _, err = tx.Exec("DELETE FROM "+postgresTableName+" WHERE version=$1", migration.ID); err != nil {
 
-			err = tx.Rollback()
-			return err
+			return
 
 		}
 	}
-
-	err = tx.Commit()
-	return err
+	return
 }
 
 // Versions lists all the applied versions.
