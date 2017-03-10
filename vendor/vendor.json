@@ -7,52 +7,52 @@
 			"revision": ""
 		},
 		{
-			"checksumSHA1": "JHoRPRXj8gNaEMuB1deDsZxi6y8=",
+			"checksumSHA1": "1M9mQhCU5CQMpswhzCOFZFByP/Q=",
 			"path": "github.com/Boostport/avatica",
-			"revision": "7e1ec6beb400229dc8ddff505f036c22c2b87dee",
-			"revisionTime": "2016-10-06T06:22:28Z"
+			"revision": "c86be94504f6a6b6c6dc9cd68495b065df13ca4d",
+			"revisionTime": "2017-03-10T06:02:38Z"
 		},
 		{
-			"checksumSHA1": "G7PMSdFP+ul6etfmmgxbQgDKoNY=",
+			"checksumSHA1": "GZCBBPXrdO5M1bWXf2kqXuctnkI=",
 			"path": "github.com/Boostport/avatica/message",
-			"revision": "1ccfc5b634deb671a8c6b348ce24bc753aada3af",
-			"revisionTime": "2016-09-30T00:45:20Z"
+			"revision": "c86be94504f6a6b6c6dc9cd68495b065df13ca4d",
+			"revisionTime": "2017-03-10T06:02:38Z"
 		},
 		{
-			"checksumSHA1": "jEXpLrWXoQvH/zk1lW5Si0swr6Y=",
+			"checksumSHA1": "QD6LqgLz2JMxXqns8TaxtK9AuHs=",
 			"path": "github.com/go-sql-driver/mysql",
-			"revision": "0b58b37b664c21f3010e836f1b931e1d0b0b0685",
-			"revisionTime": "2016-08-02T11:38:42Z"
+			"revision": "2e00b5cd70399450106cec6431c2e2ce3cae5034",
+			"revisionTime": "2016-12-24T12:10:19Z"
 		},
 		{
-			"checksumSHA1": "qjr2SKQanbmna221z0Ce2n0hnDE=",
+			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
 			"path": "github.com/golang/protobuf/proto",
-			"revision": "df1d3ca07d2d07bba352d5b73c4313b4e2a6203e",
-			"revisionTime": "2016-09-27T20:09:49Z"
+			"revision": "c9c7427a2a70d2eb3bafa0ab2dc163e45f143317",
+			"revisionTime": "2017-03-07T00:15:33Z"
 		},
 		{
-			"checksumSHA1": "Uzyon2091lmwacNsl1hCytjhHtg=",
+			"checksumSHA1": "b8F628srIitj5p7Y130xc9k0QWs=",
 			"path": "github.com/hashicorp/go-cleanhttp",
-			"revision": "ad28ea4487f05916463e2423a55166280e8254b5",
-			"revisionTime": "2016-04-07T17:41:26Z"
+			"revision": "3573b8b52aa7b37b9358d966a898feb387f62437",
+			"revisionTime": "2017-02-11T01:34:15Z"
 		},
 		{
-			"checksumSHA1": "dNYxHiBLalTqluak2/Z8c3RsSEM=",
+			"checksumSHA1": "JQG/9gSl4PjB+gde5cRTKimE4qE=",
 			"path": "github.com/lib/pq",
-			"revision": "50761b0867bd1d9d069276790bcd4a3bccf2324a",
-			"revisionTime": "2016-08-31T22:25:20Z"
+			"revision": "e4af84aab01e159ca479940dbde304519e8e8811",
+			"revisionTime": "2017-03-09T16:49:12Z"
 		},
 		{
-			"checksumSHA1": "xppHi82MLqVx1eyQmbhTesAEjx8=",
+			"checksumSHA1": "Gk3jTNQ5uGDUE0WMJFWcYz9PMps=",
 			"path": "github.com/lib/pq/oid",
-			"revision": "50761b0867bd1d9d069276790bcd4a3bccf2324a",
-			"revisionTime": "2016-08-31T22:25:20Z"
+			"revision": "e4af84aab01e159ca479940dbde304519e8e8811",
+			"revisionTime": "2017-03-09T16:49:12Z"
 		},
 		{
-			"checksumSHA1": "0YgW0+rmiIzLlvhIKlQ0s0olPg8=",
+			"checksumSHA1": "fM5Ysl+nlW/48x2boH2QZh08q8o=",
 			"path": "github.com/mattn/go-sqlite3",
-			"revision": "e5a3c16c5c1d80b24f633e68aecd6b0702786d3d",
-			"revisionTime": "2016-10-04T16:01:36Z"
+			"revision": "eac1dfa2a61ebccaa117538a5bb12044f6700cd0",
+			"revisionTime": "2017-03-05T14:02:06Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
@@ -61,16 +61,16 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		},
 		{
-			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",
+			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
 			"path": "golang.org/x/net/context",
-			"revision": "0f2be02c5ddfa7c7936000ad519b04c6c795eab3",
-			"revisionTime": "2016-10-01T18:52:36Z"
+			"revision": "a6577fac2d73be281a500b310739095313165611",
+			"revisionTime": "2017-03-08T20:54:49Z"
 		},
 		{
 			"checksumSHA1": "WHc3uByvGaMcnSoI21fhzYgbOgg=",
 			"path": "golang.org/x/net/context/ctxhttp",
-			"revision": "0f2be02c5ddfa7c7936000ad519b04c6c795eab3",
-			"revisionTime": "2016-10-01T18:52:36Z"
+			"revision": "a6577fac2d73be281a500b310739095313165611",
+			"revisionTime": "2017-03-08T20:54:49Z"
 		}
 	],
 	"rootPath": "github.com/Boostport/migration"
