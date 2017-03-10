@@ -16,7 +16,7 @@ services:
     ports:
       - "5432"
 dev:
-  image: golang:1.7.1-alpine
+  image: golang:1.8-alpine
   env:
     PHOENIX_HOST: http://phoenix:8765
     MYSQL_HOST: mysql:3306
