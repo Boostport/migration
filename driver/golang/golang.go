@@ -38,14 +38,14 @@ func (c *GolangConfig) Get(key interface{}) interface{} {
 	return c.config[key]
 }
 
-type golangSource struct {
+type GolangSource struct {
 	sync.Mutex
 	migrations map[string]func(c *GolangConfig) error
 }
 
 // NewGolangSource creates a source for storing Go functions as migrations.
-func NewGolangSource() *golangSource {
-	return &golangSource{
+func NewGolangSource() *GolangSource {
+	return &GolangSource{
 		migrations: map[string]func(c *GolangConfig) error{},
 	}
 }
@@ -53,7 +53,7 @@ func NewGolangSource() *golangSource {
 // AddMigration adds a new migration to the source. The file parameter follows the same conventions as you would use
 // for a physical file for other types of migrations, however you should omit the file extension. Example: 1_init.up
 // and 1_init.down
-func (s *golangSource) AddMigration(file string, direction m.Direction, migration func(c *GolangConfig) error) {
+func (s *GolangSource) AddMigration(file string, direction m.Direction, migration func(c *GolangConfig) error) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -66,7 +66,7 @@ func (s *golangSource) AddMigration(file string, direction m.Direction, migratio
 	s.migrations[file+".go"] = migration
 }
 
-func (s *golangSource) getMigration(file string) func(c *GolangConfig) error {
+func (s *GolangSource) getMigration(file string) func(c *GolangConfig) error {
 	s.Lock()
 	defer s.Unlock()
 
@@ -74,7 +74,7 @@ func (s *golangSource) getMigration(file string) func(c *GolangConfig) error {
 }
 
 // ListMigrationFiles lists the available migrations in the source
-func (s *golangSource) ListMigrationFiles() ([]string, error) {
+func (s *GolangSource) ListMigrationFiles() ([]string, error) {
 	keys := []string{}
 
 	s.Lock()
@@ -88,7 +88,7 @@ func (s *golangSource) ListMigrationFiles() ([]string, error) {
 }
 
 // GetMigrationFile retrieves a migration given the filename.
-func (s *golangSource) GetMigrationFile(file string) (io.Reader, error) {
+func (s *GolangSource) GetMigrationFile(file string) (io.Reader, error) {
 
 	s.Lock()
 	defer s.Unlock()
@@ -103,7 +103,7 @@ func (s *golangSource) GetMigrationFile(file string) (io.Reader, error) {
 }
 
 type Golang struct {
-	source        *golangSource
+	source        *GolangSource
 	config        *GolangConfig
 	updateVersion UpdateVersionFunc
 	applied       AppliedVersionsFunc
@@ -115,7 +115,7 @@ type AppliedVersionsFunc func(config *GolangConfig) ([]string, error)
 
 // NewGolang creates a new Go migration driver. It requires a source a function for saving the executed migration version, a function for deleting a version
 // that was migrated downwards, a function for listing all applied migrations and optionally a configuration.
-func NewGolang(source *golangSource, updateVersion UpdateVersionFunc, applied AppliedVersionsFunc, config *GolangConfig) (m.Driver, error) {
+func NewGolang(source *GolangSource, updateVersion UpdateVersionFunc, applied AppliedVersionsFunc, config *GolangConfig) (m.Driver, error) {
 	return &Golang{
 		source:        source,
 		config:        config,
