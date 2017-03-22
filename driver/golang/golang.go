@@ -9,21 +9,21 @@ import (
 	m "github.com/Boostport/migration"
 )
 
-type golangConfig struct {
+type GolangConfig struct {
 	sync.Mutex
 	config map[interface{}]interface{}
 }
 
 // NewGolangConfig creates a concurrency-safe configuration map for passing configuration data and things like
 // database handlers to your migrations.
-func NewGolangConfig() *golangConfig {
-	return &golangConfig{
+func NewGolangConfig() *GolangConfig {
+	return &GolangConfig{
 		config: map[interface{}]interface{}{},
 	}
 }
 
 // Set adds a new key-value pair to the configuration.
-func (c *golangConfig) Set(key, val interface{}) {
+func (c *GolangConfig) Set(key, val interface{}) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -31,7 +31,7 @@ func (c *golangConfig) Set(key, val interface{}) {
 }
 
 // Get retrieves a value from the configuration using the key.
-func (c *golangConfig) Get(key interface{}) interface{} {
+func (c *GolangConfig) Get(key interface{}) interface{} {
 	c.Lock()
 	defer c.Unlock()
 
@@ -40,20 +40,20 @@ func (c *golangConfig) Get(key interface{}) interface{} {
 
 type golangSource struct {
 	sync.Mutex
-	migrations map[string]func(c *golangConfig) error
+	migrations map[string]func(c *GolangConfig) error
 }
 
 // NewGolangSource creates a source for storing Go functions as migrations.
 func NewGolangSource() *golangSource {
 	return &golangSource{
-		migrations: map[string]func(c *golangConfig) error{},
+		migrations: map[string]func(c *GolangConfig) error{},
 	}
 }
 
 // AddMigration adds a new migration to the source. The file parameter follows the same conventions as you would use
 // for a physical file for other types of migrations, however you should omit the file extension. Example: 1_init.up
 // and 1_init.down
-func (s *golangSource) AddMigration(file string, direction m.Direction, migration func(c *golangConfig) error) {
+func (s *golangSource) AddMigration(file string, direction m.Direction, migration func(c *GolangConfig) error) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -66,7 +66,7 @@ func (s *golangSource) AddMigration(file string, direction m.Direction, migratio
 	s.migrations[file+".go"] = migration
 }
 
-func (s *golangSource) getMigration(file string) func(c *golangConfig) error {
+func (s *golangSource) getMigration(file string) func(c *GolangConfig) error {
 	s.Lock()
 	defer s.Unlock()
 
@@ -104,18 +104,18 @@ func (s *golangSource) GetMigrationFile(file string) (io.Reader, error) {
 
 type Golang struct {
 	source        *golangSource
-	config        *golangConfig
+	config        *GolangConfig
 	updateVersion updateVersionFunc
 	applied       appliedVersionsFunc
 }
 
-type updateVersionFunc func(id string, direction m.Direction, config *golangConfig) error
+type updateVersionFunc func(id string, direction m.Direction, config *GolangConfig) error
 
-type appliedVersionsFunc func(config *golangConfig) ([]string, error)
+type appliedVersionsFunc func(config *GolangConfig) ([]string, error)
 
 // NewGolang creates a new Go migration driver. It requires a source a function for saving the executed migration version, a function for deleting a version
 // that was migrated downwards, a function for listing all applied migrations and optionally a configuration.
-func NewGolang(source *golangSource, updateVersion updateVersionFunc, applied appliedVersionsFunc, config *golangConfig) (m.Driver, error) {
+func NewGolang(source *golangSource, updateVersion updateVersionFunc, applied appliedVersionsFunc, config *GolangConfig) (m.Driver, error) {
 	return &Golang{
 		source:        source,
 		config:        config,

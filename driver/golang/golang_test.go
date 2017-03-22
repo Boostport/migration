@@ -24,7 +24,7 @@ func TestGolangDriver(t *testing.T) {
 
 	source := NewGolangSource()
 
-	source.AddMigration("1_init", migration.Up, func(c *golangConfig) error {
+	source.AddMigration("1_init", migration.Up, func(c *GolangConfig) error {
 
 		db := c.Get("db")
 
@@ -37,7 +37,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	})
 
-	source.AddMigration("1_init", migration.Down, func(c *golangConfig) error {
+	source.AddMigration("1_init", migration.Down, func(c *GolangConfig) error {
 
 		db := c.Get("db")
 
@@ -50,7 +50,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	})
 
-	source.AddMigration("2_update", migration.Up, func(c *golangConfig) error {
+	source.AddMigration("2_update", migration.Up, func(c *GolangConfig) error {
 
 		db := c.Get("db")
 
@@ -63,7 +63,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	})
 
-	source.AddMigration("2_update", migration.Down, func(c *golangConfig) error {
+	source.AddMigration("2_update", migration.Down, func(c *GolangConfig) error {
 
 		db := c.Get("db")
 
@@ -76,7 +76,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	})
 
-	applied := func(c *golangConfig) ([]string, error) {
+	applied := func(c *GolangConfig) ([]string, error) {
 		versions := c.Get("versions")
 
 		if versions == nil {
@@ -92,7 +92,7 @@ func TestGolangDriver(t *testing.T) {
 		return keys, nil
 	}
 
-	updateVersion := func(id string, direction migration.Direction, c *golangConfig) error {
+	updateVersion := func(id string, direction migration.Direction, c *GolangConfig) error {
 		versions := c.Get("versions")
 
 		if versions == nil {
