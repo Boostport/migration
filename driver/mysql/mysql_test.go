@@ -36,7 +36,7 @@ func TestMySQLDriver(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	driver, err := NewMySQL("root:@tcp(" + mysqlHost + ")/" + database)
+	driver, err := New("root:@tcp(" + mysqlHost + ")/" + database)
 
 	if err != nil {
 		t.Errorf("Unable to open connection to mysql server: %s", err)
@@ -49,7 +49,7 @@ func TestMySQLDriver(t *testing.T) {
 	}()
 
 	migrations := []*migration.PlannedMigration{
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID: "201610041422_init",
 				Up: `CREATE TABLE test_table1 (id integer not null primary key);
@@ -58,7 +58,7 @@ func TestMySQLDriver(t *testing.T) {
 			},
 			Direction: migration.Up,
 		},
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID:   "201610041425_drop_unused_table",
 				Up:   "DROP TABLE test_table2",
@@ -66,7 +66,7 @@ func TestMySQLDriver(t *testing.T) {
 			},
 			Direction: migration.Up,
 		},
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID: "201610041422_invalid_sql",
 				Up: "CREATE TABLE test_table3 (some error",

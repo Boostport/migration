@@ -13,7 +13,7 @@ func TestGolangDriver(t *testing.T) {
 
 	mockDBVersions := map[string]struct{}{}
 
-	config := NewGolangConfig()
+	config := NewConfig()
 	config.Set("test", "test")
 	config.Set("db", mockDB)
 	config.Set("versions", mockDBVersions)
@@ -22,9 +22,9 @@ func TestGolangDriver(t *testing.T) {
 		t.Errorf("Expected test key in config to return %s, got %v", "test", v)
 	}
 
-	source := NewGolangSource()
+	source := NewSource()
 
-	source.AddMigration("1_init", migration.Up, func(c *GolangConfig) error {
+	source.AddMigration("1_init", migration.Up, func(c *Config) error {
 
 		db := c.Get("db")
 
@@ -37,7 +37,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	})
 
-	source.AddMigration("1_init", migration.Down, func(c *GolangConfig) error {
+	source.AddMigration("1_init", migration.Down, func(c *Config) error {
 
 		db := c.Get("db")
 
@@ -50,7 +50,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	})
 
-	source.AddMigration("2_update", migration.Up, func(c *GolangConfig) error {
+	source.AddMigration("2_update", migration.Up, func(c *Config) error {
 
 		db := c.Get("db")
 
@@ -63,7 +63,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	})
 
-	source.AddMigration("2_update", migration.Down, func(c *GolangConfig) error {
+	source.AddMigration("2_update", migration.Down, func(c *Config) error {
 
 		db := c.Get("db")
 
@@ -76,7 +76,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	})
 
-	applied := func(c *GolangConfig) ([]string, error) {
+	applied := func(c *Config) ([]string, error) {
 		versions := c.Get("versions")
 
 		if versions == nil {
@@ -92,7 +92,7 @@ func TestGolangDriver(t *testing.T) {
 		return keys, nil
 	}
 
-	updateVersion := func(id string, direction migration.Direction, c *GolangConfig) error {
+	updateVersion := func(id string, direction migration.Direction, c *Config) error {
 		versions := c.Get("versions")
 
 		if versions == nil {
@@ -108,7 +108,7 @@ func TestGolangDriver(t *testing.T) {
 		return nil
 	}
 
-	driver, err := NewGolang(source, updateVersion, applied, config)
+	driver, err := New(source, updateVersion, applied, config)
 
 	if err != nil {
 		t.Errorf("Unexpected error while creating driver: %s", err)

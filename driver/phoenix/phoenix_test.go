@@ -30,7 +30,7 @@ func TestPhoenixDriver(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	driver, err := NewPhoenix(phoenixHost + "/")
+	driver, err := New(phoenixHost + "/")
 
 	if err != nil {
 		t.Errorf("Unable to open connection to phoenix server: %s", err)
@@ -46,7 +46,7 @@ func TestPhoenixDriver(t *testing.T) {
 	}()
 
 	migrations := []*migration.PlannedMigration{
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID: "201610041422_init",
 				Up: `CREATE TABLE test_table1 (id integer not null primary key);
@@ -55,7 +55,7 @@ func TestPhoenixDriver(t *testing.T) {
 			},
 			Direction: migration.Up,
 		},
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID:   "201610041425_drop_unused_table",
 				Up:   "DROP TABLE test_table2",
@@ -63,7 +63,7 @@ func TestPhoenixDriver(t *testing.T) {
 			},
 			Direction: migration.Up,
 		},
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID: "201610041422_invalid_sql",
 				Up: "CREATE TABLE test_table3 (some error",
