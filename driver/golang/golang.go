@@ -105,17 +105,17 @@ func (s *golangSource) GetMigrationFile(file string) (io.Reader, error) {
 type Golang struct {
 	source        *golangSource
 	config        *GolangConfig
-	updateVersion updateVersionFunc
-	applied       appliedVersionsFunc
+	updateVersion UpdateVersionFunc
+	applied       AppliedVersionsFunc
 }
 
-type updateVersionFunc func(id string, direction m.Direction, config *GolangConfig) error
+type UpdateVersionFunc func(id string, direction m.Direction, config *GolangConfig) error
 
-type appliedVersionsFunc func(config *GolangConfig) ([]string, error)
+type AppliedVersionsFunc func(config *GolangConfig) ([]string, error)
 
 // NewGolang creates a new Go migration driver. It requires a source a function for saving the executed migration version, a function for deleting a version
 // that was migrated downwards, a function for listing all applied migrations and optionally a configuration.
-func NewGolang(source *golangSource, updateVersion updateVersionFunc, applied appliedVersionsFunc, config *GolangConfig) (m.Driver, error) {
+func NewGolang(source *golangSource, updateVersion UpdateVersionFunc, applied AppliedVersionsFunc, config *GolangConfig) (m.Driver, error) {
 	return &Golang{
 		source:        source,
 		config:        config,
