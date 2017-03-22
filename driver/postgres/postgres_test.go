@@ -42,7 +42,7 @@ func TestPostgresDriver(t *testing.T) {
 
 	defer connection2.Close()
 
-	driver, err := NewPostgres("postgres://postgres:@" + postgresHost + "/" + database + "?sslmode=disable")
+	driver, err := New("postgres://postgres:@" + postgresHost + "/" + database + "?sslmode=disable")
 
 	if err != nil {
 		t.Errorf("Unable to open connection to postgres server: %s", err)
@@ -51,7 +51,7 @@ func TestPostgresDriver(t *testing.T) {
 	defer driver.Close()
 
 	migrations := []*migration.PlannedMigration{
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID: "201610041422_init",
 				Up: `CREATE TABLE test_table1 (id integer not null primary key);
@@ -61,7 +61,7 @@ func TestPostgresDriver(t *testing.T) {
 			},
 			Direction: migration.Up,
 		},
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID:   "201610041425_drop_unused_table",
 				Up:   "DROP TABLE test_table2",
@@ -69,7 +69,7 @@ func TestPostgresDriver(t *testing.T) {
 			},
 			Direction: migration.Up,
 		},
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID: "201610041422_invalid_sql",
 				Up: "CREATE TABLE test_table3 (some error",

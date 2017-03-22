@@ -9,20 +9,20 @@ import (
 
 func TestSQLiteDriver(t *testing.T) {
 
-	driver, err := NewSQLite("file::memory:?cache=shared&_busy_timeout=50000")
+	driver, err := New("file::memory:?cache=shared&_busy_timeout=50000")
 
 	if err != nil {
 		t.Errorf("Unable to open connection to server: %s", err)
 	}
 
 	defer func() {
-		driver.(*SQLite).db.Exec("DROP TABLE IF EXISTS " + sqliteTableName)
+		driver.(*Driver).db.Exec("DROP TABLE IF EXISTS " + sqliteTableName)
 	}()
 
 	defer driver.Close()
 
 	migrations := []*migration.PlannedMigration{
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID: "201610041422_init",
 				Up: `CREATE TABLE test_table1 (id integer not null primary key);
@@ -32,7 +32,7 @@ func TestSQLiteDriver(t *testing.T) {
 			},
 			Direction: migration.Up,
 		},
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID:   "201610041425_drop_unused_table",
 				Up:   "DROP TABLE test_table2",
@@ -40,7 +40,7 @@ func TestSQLiteDriver(t *testing.T) {
 			},
 			Direction: migration.Up,
 		},
-		&migration.PlannedMigration{
+		{
 			Migration: &migration.Migration{
 				ID: "201610041422_invalid_sql",
 				Up: "CREATE TABLE test_table3 (some error",
@@ -55,13 +55,13 @@ func TestSQLiteDriver(t *testing.T) {
 		t.Errorf("Unexpected error while running migration: %s", err)
 	}
 
-	_, err = driver.(*SQLite).db.Exec("INSERT INTO test_table1 (id) values (1)")
+	_, err = driver.(*Driver).db.Exec("INSERT INTO test_table1 (id) values (1)")
 
 	if err != nil {
 		t.Errorf("Unexpected error while testing if migration succeeded: %s", err)
 	}
 
-	_, err = driver.(*SQLite).db.Exec("INSERT INTO test_table2 (id) values (1)")
+	_, err = driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)")
 
 	if err != nil {
 		t.Errorf("Unexpected error while testing if migration succeeded: %s", err)
@@ -73,7 +73,7 @@ func TestSQLiteDriver(t *testing.T) {
 		t.Errorf("Unexpected error while running migration: %s", err)
 	}
 
-	if _, err := driver.(*SQLite).db.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
+	if _, err := driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
 
 		reg := regexp.MustCompile(`^no such table: .+`)
 

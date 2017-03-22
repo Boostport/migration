@@ -14,10 +14,10 @@ Simple and pragmatic migrations for Go applications.
 
 ## Drivers
 - Apache Phoenix
+- Golang (runs generic go functions)
 - MySQL
 - PostgreSQL
 - SQLite
-- Golang (runs generic go functions)
 
 ## Quickstart
 ```go
@@ -29,7 +29,7 @@ assetMigration := &migration.AssetMigrationSource{
 }
 
 // Create driver
-driver, err := migration.NewPhoenix("http://localhost:8765")
+driver, err := phoenix.New("http://localhost:8765")
 
 // Run all up migrations
 applied, err := Migrate(driver, assetMigration, migration.Up, 0)
@@ -84,52 +84,52 @@ Sometimes, we might be working with a database or have a situation where the que
 to perform the required migrations. For example, we might have to get some data out of the database, perform some 
 transformations and then write it back. For these type of situations, you can use Go for migrations.
 
-When using Go for migrations, create a `golangSource` using `NewGolangSource()`. Then, simply add migrations to the source
+When using Go for migrations, create a `golang.Source` using `golang.NewSource()`. Then, simply add migrations to the source
 using the `AddMigration()` method. You will need to pass in the name of the migration without the extension and direction, e.g.
 `1_init`. For the second parameter, pass in the direction (`migration.Up` or `migration.Down`) and for the third parameter,
 pass in a function or method with this signature: `func(c *golangConfig) error` for running the migration.
 
-If your migrations need to access configuration values or database clients, create a `golangConfig` struct using
-`NewGolangConfig()`. This is concurrency-safe, and you can set values into it using `Set()` and retrieve values using `Get()`.
+If your migrations need to access configuration values or database clients, create a `golang.Config` struct using
+`golang.NewConfig()`. This is concurrency-safe, and you can set values into it using `Set()` and retrieve values using `Get()`.
 
 Finally, you need to define 2 functions:
-- A function for writing or deleting an applied migration matching this signature: `func(config *golangConfig, id string, direction migration.Direction) error`
-- A function for getting a list of applied migrations matching this signature: `func(config *golangConfig) ([]string, error)`
+- A function for writing or deleting an applied migration matching this signature: `func(config *golang.Config, id string, direction migration.Direction) error`
+- A function for getting a list of applied migrations matching this signature: `func(config *golang.Config) ([]string, error)`
 
 These are required for initializing the driver:
 ```go
-driver, err := NewGolangDriver(source, updateVersion, applied, config)
+driver, err := golang.New(source, updateVersion, applied, config)
 ```
 
 Here's a quick example:
 ```go
-source := NewGolangSource()
+source := golang.NewSource()
 
-source.AddMigration("1_init", migration.Up, func(c *golangConfig) error {
+source.AddMigration("1_init", migration.Up, func(c *golang.Config) error {
     // Run up migration here
     
     // If required, you can retrieve configuration here: something := c.Get("something")
 })
 
-source.AddMigration("1_init", migration.Down, func(c *golangConfig) error {
+source.AddMigration("1_init", migration.Down, func(c *golang.Config) error {
     // Run down migration here
 })
 
 // Create config
-config := NewGolangConfig()
+config := golang.NewConfig()
 config.Set("test", "test")
 
 // Define functions
-applied := func(c *golangConfig) ([]string, error) {
+applied := func(c *golang.Config) ([]string, error) {
     // Return list of applied migrations
 }
 
-updateVersion := func(id string, direction migration.Direction, c *golangConfig) error {
+updateVersion := func(id string, direction migration.Direction, c *golangC.onfig) error {
     // Write or delete applied migration in storage
 }
 
 // Create driver
-driver, err := NewGolang(source, updateVersion, applied, config)
+driver, err := golang.New(source, updateVersion, applied, config)
 
 // Run migrations
 count, err = migration.Migrate(driver, source, migration.Up, 0)

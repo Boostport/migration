@@ -8,15 +8,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Postgres struct {
+type Driver struct {
 	db *sql.DB
 }
 
 const postgresTableName = "schema_migration"
 
-// NewPostgres creates a new Postgres driver.
+// NewPostgres creates a new Driver driver.
 // The DSN is documented here: https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
-func NewPostgres(dsn string) (m.Driver, error) {
+func New(dsn string) (m.Driver, error) {
 
 	db, err := sql.Open("postgres", dsn)
 
@@ -28,7 +28,7 @@ func NewPostgres(dsn string) (m.Driver, error) {
 		return nil, err
 	}
 
-	d := &Postgres{
+	d := &Driver{
 		db: db,
 	}
 
@@ -39,19 +39,19 @@ func NewPostgres(dsn string) (m.Driver, error) {
 	return d, nil
 }
 
-// Close closes the connection to the Postgres server.
-func (driver *Postgres) Close() error {
+// Close closes the connection to the Driver server.
+func (driver *Driver) Close() error {
 	err := driver.db.Close()
 	return err
 }
 
-func (driver *Postgres) ensureVersionTableExists() error {
+func (driver *Driver) ensureVersionTableExists() error {
 	_, err := driver.db.Exec("CREATE TABLE IF NOT EXISTS " + postgresTableName + " (version varchar(255) not null primary key)")
 	return err
 }
 
 // Migrate runs a migration.
-func (driver *Postgres) Migrate(migration *m.PlannedMigration) (err error) {
+func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 	// Note: MySQL does not support DDL statements in a transaction. If DDL statements are
 	// executed in a transaction, it is an implicit commit.
@@ -107,7 +107,7 @@ func (driver *Postgres) Migrate(migration *m.PlannedMigration) (err error) {
 }
 
 // Versions lists all the applied versions.
-func (driver *Postgres) Versions() ([]string, error) {
+func (driver *Driver) Versions() ([]string, error) {
 	versions := []string{}
 
 	rows, err := driver.db.Query("SELECT version FROM " + postgresTableName + " ORDER BY version DESC")

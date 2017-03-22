@@ -9,15 +9,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type MySQL struct {
+type Driver struct {
 	db *sql.DB
 }
 
 const mysqlTableName = "schema_migration"
 
-// NewMySQL creates a new MySQL driver.
+// New creates a new Driver driver.
 // The DSN is documented here: https://github.com/go-sql-driver/mysql#dsn-data-source-name
-func NewMySQL(dsn string) (m.Driver, error) {
+func New(dsn string) (m.Driver, error) {
 
 	db, err := sql.Open("mysql", dsn)
 
@@ -29,7 +29,7 @@ func NewMySQL(dsn string) (m.Driver, error) {
 		return nil, err
 	}
 
-	d := &MySQL{
+	d := &Driver{
 		db: db,
 	}
 
@@ -40,21 +40,21 @@ func NewMySQL(dsn string) (m.Driver, error) {
 	return d, nil
 }
 
-// Close closes the connection to the MySQL server.
-func (driver *MySQL) Close() error {
+// Close closes the connection to the Driver server.
+func (driver *Driver) Close() error {
 	err := driver.db.Close()
 	return err
 }
 
-func (driver *MySQL) ensureVersionTableExists() error {
+func (driver *Driver) ensureVersionTableExists() error {
 	_, err := driver.db.Exec("CREATE TABLE IF NOT EXISTS " + mysqlTableName + " (version varchar(255) not null primary key)")
 	return err
 }
 
 // Migrate runs a migration.
-func (driver *MySQL) Migrate(migration *m.PlannedMigration) error {
+func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
 
-	// Note: MySQL does not support DDL statements in a transaction. If DDL statements are
+	// Note: Driver does not support DDL statements in a transaction. If DDL statements are
 	// executed in a transaction, it is an implicit commit.
 	// See: http://dev.mysql.com/doc/refman/5.7/en/implicit-commit.html
 	var content string
@@ -68,7 +68,7 @@ func (driver *MySQL) Migrate(migration *m.PlannedMigration) error {
 		content = migration.Down
 	}
 
-	// MySQL does not support multiple statements, so we need to do this.
+	// Driver does not support multiple statements, so we need to do this.
 	sqlStmts := strings.Split(content, ";")
 
 	for _, sqlStmt := range sqlStmts {
@@ -97,7 +97,7 @@ func (driver *MySQL) Migrate(migration *m.PlannedMigration) error {
 }
 
 // Versions lists all the applied versions.
-func (driver *MySQL) Versions() ([]string, error) {
+func (driver *Driver) Versions() ([]string, error) {
 	versions := []string{}
 
 	rows, err := driver.db.Query("SELECT version FROM " + mysqlTableName + " ORDER BY version DESC")

@@ -9,15 +9,15 @@ import (
 	m "github.com/Boostport/migration"
 )
 
-type Phoenix struct {
+type Driver struct {
 	db *sql.DB
 }
 
 const phoenixTableName = "schema_migration"
 
-// NewPhoenix creates a new Apache Phoenix driver.
+// New creates a new Apache Driver driver.
 // The DSN is documented here: https://github.com/Boostport/avatica#dsn-data-source-name
-func NewPhoenix(dsn string) (m.Driver, error) {
+func New(dsn string) (m.Driver, error) {
 
 	db, err := sql.Open("avatica", dsn)
 
@@ -29,7 +29,7 @@ func NewPhoenix(dsn string) (m.Driver, error) {
 		return nil, err
 	}
 
-	p := &Phoenix{
+	p := &Driver{
 		db: db,
 	}
 
@@ -40,21 +40,21 @@ func NewPhoenix(dsn string) (m.Driver, error) {
 	return p, nil
 }
 
-// Close closes the connection to the Apache Phoenix server.
-func (driver *Phoenix) Close() error {
+// Close closes the connection to the Apache Driver server.
+func (driver *Driver) Close() error {
 	err := driver.db.Close()
 	return err
 }
 
-func (driver *Phoenix) ensureVersionTableExists() error {
+func (driver *Driver) ensureVersionTableExists() error {
 	_, err := driver.db.Exec("CREATE TABLE IF NOT EXISTS " + phoenixTableName + " (version varchar not null primary key) TRANSACTIONAL=true")
 	return err
 }
 
 // Migrate runs a migration.
-func (driver *Phoenix) Migrate(migration *m.PlannedMigration) error {
+func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
 
-	// TODO: Phoenix does not support DDL statements yet :( See PHOENIX-3358
+	// TODO: Driver does not support DDL statements yet :( See PHOENIX-3358
 
 	var content string
 
@@ -67,7 +67,7 @@ func (driver *Phoenix) Migrate(migration *m.PlannedMigration) error {
 		content = migration.Down
 	}
 
-	// Phoenix does not support multiple statements, so we need to do this.
+	// Driver does not support multiple statements, so we need to do this.
 	sqlStmts := strings.Split(content, ";")
 
 	for _, sqlStmt := range sqlStmts {
@@ -96,7 +96,7 @@ func (driver *Phoenix) Migrate(migration *m.PlannedMigration) error {
 }
 
 // Versions lists all the applied versions.
-func (driver *Phoenix) Versions() ([]string, error) {
+func (driver *Driver) Versions() ([]string, error) {
 	versions := []string{}
 
 	rows, err := driver.db.Query("SELECT version FROM " + phoenixTableName + " ORDER BY version DESC")

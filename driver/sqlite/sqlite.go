@@ -8,15 +8,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type SQLite struct {
+type Driver struct {
 	db *sql.DB
 }
 
 const sqliteTableName = "schema_migration"
 
-// NewSQLite creates a new SQLite driver.
+// NewSQLite creates a new Driver driver.
 // The DSN is documented here: https://godoc.org/github.com/mattn/go-sqlite3#SQLiteDriver.Open
-func NewSQLite(dsn string) (m.Driver, error) {
+func New(dsn string) (m.Driver, error) {
 
 	db, err := sql.Open("sqlite3", dsn)
 
@@ -28,7 +28,7 @@ func NewSQLite(dsn string) (m.Driver, error) {
 		return nil, err
 	}
 
-	d := &SQLite{
+	d := &Driver{
 		db: db,
 	}
 
@@ -39,19 +39,19 @@ func NewSQLite(dsn string) (m.Driver, error) {
 	return d, nil
 }
 
-// Close closes the connection to the SQLite server.
-func (driver *SQLite) Close() error {
+// Close closes the connection to the Driver server.
+func (driver *Driver) Close() error {
 	err := driver.db.Close()
 	return err
 }
 
-func (driver *SQLite) ensureVersionTableExists() error {
+func (driver *Driver) ensureVersionTableExists() error {
 	_, err := driver.db.Exec("CREATE TABLE IF NOT EXISTS " + sqliteTableName + " (version varchar(255) not null primary key)")
 	return err
 }
 
 // Migrate runs a migration.
-func (driver *SQLite) Migrate(migration *m.PlannedMigration) (err error) {
+func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 	// Note: MySQL does not support DDL statements in a transaction. If DDL statements are
 	// executed in a transaction, it is an implicit commit.
@@ -105,7 +105,7 @@ func (driver *SQLite) Migrate(migration *m.PlannedMigration) (err error) {
 }
 
 // Versions lists all the applied versions.
-func (driver *SQLite) Versions() ([]string, error) {
+func (driver *Driver) Versions() ([]string, error) {
 	versions := []string{}
 
 	rows, err := driver.db.Query("SELECT version FROM " + sqliteTableName + " ORDER BY version DESC")
