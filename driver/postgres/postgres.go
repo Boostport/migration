@@ -9,14 +9,15 @@ import (
 )
 
 type Driver struct {
-	db *sql.DB
+	db              *sql.DB
+	useTransactions bool
 }
 
 const postgresTableName = "schema_migration"
 
 // NewPostgres creates a new Driver driver.
 // The DSN is documented here: https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
-func New(dsn string) (m.Driver, error) {
+func New(dsn string, useTransactions bool) (m.Driver, error) {
 
 	db, err := sql.Open("postgres", dsn)
 
@@ -29,7 +30,8 @@ func New(dsn string) (m.Driver, error) {
 	}
 
 	d := &Driver{
-		db: db,
+		db:              db,
+		useTransactions: useTransactions,
 	}
 
 	if err := d.ensureVersionTableExists(); err != nil {
@@ -53,53 +55,59 @@ func (driver *Driver) ensureVersionTableExists() error {
 // Migrate runs a migration.
 func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
-	var content string
+	var (
+		content       string
+		insertVersion string
+	)
 
 	if migration.Direction == m.Up {
 
 		content = migration.Up
+		insertVersion = "INSERT INTO " + postgresTableName + " (version) VALUES ($1)"
 
 	} else if migration.Direction == m.Down {
 
 		content = migration.Down
+		insertVersion = "DELETE FROM " + postgresTableName + " WHERE version=$1"
 	}
 
-	tx, err := driver.db.Begin()
+	if driver.useTransactions {
 
-	if err != nil {
-		return err
-	}
+		tx, err := driver.db.Begin()
 
-	defer func() {
 		if err != nil {
-			if errRb := tx.Rollback(); errRb != nil {
-				err = fmt.Errorf("Error rolling back: %s\n%s", errRb, err)
-			}
-			return
+			return err
 		}
-		err = tx.Commit()
-	}()
 
-	if _, err = tx.Exec(content); err != nil {
+		defer func() {
+			if err != nil {
+				if errRb := tx.Rollback(); errRb != nil {
+					err = fmt.Errorf("Error rolling back: %s\n%s", errRb, err)
+				}
+				return
+			}
+			err = tx.Commit()
+		}()
 
-		err = fmt.Errorf("Error executing statement: %s\n%s", err, content)
-		return
+		if _, err = tx.Exec(content); err != nil {
 
-	}
+			return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+		}
 
-	if migration.Direction == m.Up {
-		if _, err = tx.Exec("INSERT INTO "+postgresTableName+" (version) VALUES ($1)", migration.ID); err != nil {
-
-			return
-
+		if _, err = tx.Exec(insertVersion, migration.ID); err != nil {
+			return fmt.Errorf("Error updating migration versions: %s", err)
 		}
 	} else {
-		if _, err = tx.Exec("DELETE FROM "+postgresTableName+" WHERE version=$1", migration.ID); err != nil {
 
-			return
+		if _, err := driver.db.Exec(content); err != nil {
+			return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+		}
 
+		if _, err = driver.db.Exec(insertVersion, migration.ID); err != nil {
+			return fmt.Errorf("Error updating migration versions: %s", err)
 		}
 	}
+
 	return
 }
 

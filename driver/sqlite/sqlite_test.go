@@ -9,112 +9,113 @@ import (
 
 func TestSQLiteDriver(t *testing.T) {
 
-	driver, err := New("file::memory:?cache=shared&_busy_timeout=50000")
+	for _, useTransactions := range []bool{true, false} {
 
-	if err != nil {
-		t.Errorf("Unable to open connection to server: %s", err)
-	}
+		driver, err := New("file::memory:?cache=shared&_busy_timeout=50000", useTransactions)
 
-	defer func() {
-		driver.(*Driver).db.Exec("DROP TABLE IF EXISTS " + sqliteTableName)
-	}()
+		if err != nil {
+			t.Errorf("Unable to open connection to server: %s", err)
+		}
 
-	defer driver.Close()
-
-	migrations := []*migration.PlannedMigration{
-		{
-			Migration: &migration.Migration{
-				ID: "201610041422_init",
-				Up: `CREATE TABLE test_table1 (id integer not null primary key);
+		migrations := []*migration.PlannedMigration{
+			{
+				Migration: &migration.Migration{
+					ID: "201610041422_init",
+					Up: `CREATE TABLE test_table1 (id integer not null primary key);
 
 					     CREATE TABLE test_table2 (id integer not null primary key)
 	`,
+				},
+				Direction: migration.Up,
 			},
-			Direction: migration.Up,
-		},
-		{
-			Migration: &migration.Migration{
-				ID:   "201610041425_drop_unused_table",
-				Up:   "DROP TABLE test_table2",
-				Down: "CREATE TABLE test_table2(id integer not null primary key)",
+			{
+				Migration: &migration.Migration{
+					ID:   "201610041425_drop_unused_table",
+					Up:   "DROP TABLE test_table2",
+					Down: "CREATE TABLE test_table2(id integer not null primary key)",
+				},
+				Direction: migration.Up,
 			},
-			Direction: migration.Up,
-		},
-		{
-			Migration: &migration.Migration{
-				ID: "201610041422_invalid_sql",
-				Up: "CREATE TABLE test_table3 (some error",
+			{
+				Migration: &migration.Migration{
+					ID: "201610041422_invalid_sql",
+					Up: "CREATE TABLE test_table3 (some error",
+				},
+				Direction: migration.Up,
 			},
-			Direction: migration.Up,
-		},
-	}
-
-	err = driver.Migrate(migrations[0])
-
-	if err != nil {
-		t.Errorf("Unexpected error while running migration: %s", err)
-	}
-
-	_, err = driver.(*Driver).db.Exec("INSERT INTO test_table1 (id) values (1)")
-
-	if err != nil {
-		t.Errorf("Unexpected error while testing if migration succeeded: %s", err)
-	}
-
-	_, err = driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)")
-
-	if err != nil {
-		t.Errorf("Unexpected error while testing if migration succeeded: %s", err)
-	}
-
-	err = driver.Migrate(migrations[1])
-
-	if err != nil {
-		t.Errorf("Unexpected error while running migration: %s", err)
-	}
-
-	if _, err := driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
-
-		reg := regexp.MustCompile(`^no such table: .+`)
-
-		if !reg.MatchString(err.Error()) {
-			t.Errorf("Received an error while inserting into a non-existent table, but it was not a undefined_table error: %s", err)
 		}
-	} else {
-		t.Error("Expected an error while inserting into non-existent table, but did not receive any.")
-	}
 
-	err = driver.Migrate(migrations[2])
+		err = driver.Migrate(migrations[0])
 
-	if err == nil {
-		t.Error("Expected an error while executing invalid statement, but did not receive any.")
-	}
+		if err != nil {
+			t.Errorf("Unexpected error while running migration: %s", err)
+		}
 
-	versions, err := driver.Versions()
+		_, err = driver.(*Driver).db.Exec("INSERT INTO test_table1 (id) values (1)")
 
-	if err != nil {
-		t.Errorf("Unexpected error while retriving version information: %s", err)
-	}
+		if err != nil {
+			t.Errorf("Unexpected error while testing if migration succeeded: %s", err)
+		}
 
-	if len(versions) != 2 {
-		t.Errorf("Expected %d versions to be applied, %d was actually applied.", 2, len(versions))
-	}
+		_, err = driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)")
 
-	migrations[1].Direction = migration.Down
+		if err != nil {
+			t.Errorf("Unexpected error while testing if migration succeeded: %s", err)
+		}
 
-	err = driver.Migrate(migrations[1])
+		err = driver.Migrate(migrations[1])
 
-	if err != nil {
-		t.Errorf("Unexpected error while running migration: %s", err)
-	}
+		if err != nil {
+			t.Errorf("Unexpected error while running migration: %s", err)
+		}
 
-	versions, err = driver.Versions()
+		if _, err := driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
 
-	if err != nil {
-		t.Errorf("Unexpected error while retriving version information: %s", err)
-	}
+			reg := regexp.MustCompile(`^no such table: .+`)
 
-	if len(versions) != 1 {
-		t.Errorf("Expected %d versions to be applied, %d was actually applied.", 2, len(versions))
+			if !reg.MatchString(err.Error()) {
+				t.Errorf("Received an error while inserting into a non-existent table, but it was not a undefined_table error: %s", err)
+			}
+		} else {
+			t.Error("Expected an error while inserting into non-existent table, but did not receive any.")
+		}
+
+		err = driver.Migrate(migrations[2])
+
+		if err == nil {
+			t.Error("Expected an error while executing invalid statement, but did not receive any.")
+		}
+
+		versions, err := driver.Versions()
+
+		if err != nil {
+			t.Errorf("Unexpected error while retriving version information: %s", err)
+		}
+
+		if len(versions) != 2 {
+			t.Errorf("Expected %d versions to be applied, %d was actually applied.", 2, len(versions))
+		}
+
+		migrations[1].Direction = migration.Down
+
+		err = driver.Migrate(migrations[1])
+
+		if err != nil {
+			t.Errorf("Unexpected error while running migration: %s", err)
+		}
+
+		versions, err = driver.Versions()
+
+		if err != nil {
+			t.Errorf("Unexpected error while retriving version information: %s", err)
+		}
+
+		if len(versions) != 1 {
+			t.Errorf("Expected %d versions to be applied, %d was actually applied.", 2, len(versions))
+		}
+
+		driver.(*Driver).db.Exec("DROP TABLE IF EXISTS " + sqliteTableName)
+
+		driver.Close()
 	}
 }

@@ -9,14 +9,15 @@ import (
 )
 
 type Driver struct {
-	db *sql.DB
+	db              *sql.DB
+	useTransactions bool
 }
 
 const sqliteTableName = "schema_migration"
 
 // NewSQLite creates a new Driver driver.
 // The DSN is documented here: https://godoc.org/github.com/mattn/go-sqlite3#SQLiteDriver.Open
-func New(dsn string) (m.Driver, error) {
+func New(dsn string, useTransactions bool) (m.Driver, error) {
 
 	db, err := sql.Open("sqlite3", dsn)
 
@@ -29,7 +30,8 @@ func New(dsn string) (m.Driver, error) {
 	}
 
 	d := &Driver{
-		db: db,
+		db:              db,
+		useTransactions: useTransactions,
 	}
 
 	if err := d.ensureVersionTableExists(); err != nil {
@@ -53,51 +55,61 @@ func (driver *Driver) ensureVersionTableExists() error {
 // Migrate runs a migration.
 func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
-	var content string
+	var (
+		content       string
+		insertVersion string
+	)
 
 	if migration.Direction == m.Up {
 
 		content = migration.Up
+		insertVersion = "INSERT INTO " + sqliteTableName + " (version) VALUES (?)"
 
 	} else if migration.Direction == m.Down {
 
 		content = migration.Down
+		insertVersion = "DELETE FROM " + sqliteTableName + " WHERE version=?"
 	}
 
-	tx, err := driver.db.Begin()
+	if driver.useTransactions {
+		tx, err := driver.db.Begin()
 
-	if err != nil {
-		return err
-	}
-
-	defer func() {
 		if err != nil {
-			if errRb := tx.Rollback(); errRb != nil {
-				err = fmt.Errorf("Error rolling back: %s\n%s", errRb, err)
-			}
-			return
+			return err
 		}
-		err = tx.Commit()
-	}()
 
-	if _, err = tx.Exec(content); err != nil {
+		defer func() {
+			if err != nil {
+				if errRb := tx.Rollback(); errRb != nil {
+					err = fmt.Errorf("Error rolling back: %s\n%s", errRb, err)
+				}
+				return
+			}
+			err = tx.Commit()
+		}()
 
-		return fmt.Errorf("Error executing statement: %s\n%s", err, content)
-	}
+		if _, err = tx.Exec(content); err != nil {
 
-	if migration.Direction == m.Up {
-		if _, err = tx.Exec("INSERT INTO "+sqliteTableName+" (version) VALUES (?)", migration.ID); err != nil {
+			return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+		}
 
-			return
+		if _, err = tx.Exec(insertVersion, migration.ID); err != nil {
 
+			return fmt.Errorf("Error updating migration versions: %s", err)
 		}
 	} else {
-		if _, err = tx.Exec("DELETE FROM "+sqliteTableName+" WHERE version=?", migration.ID); err != nil {
 
-			return
+		if _, err = driver.db.Exec(content); err != nil {
 
+			return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+		}
+
+		if _, err = driver.db.Exec(insertVersion, migration.ID); err != nil {
+
+			return fmt.Errorf("Error updating migration versions: %s", err)
 		}
 	}
+
 	return
 }
 
