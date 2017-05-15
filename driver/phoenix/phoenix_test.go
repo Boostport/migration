@@ -7,6 +7,7 @@ import (
 
 	"github.com/Boostport/avatica"
 	"github.com/Boostport/migration"
+	"github.com/Boostport/migration/parser"
 )
 
 func TestPhoenixDriver(t *testing.T) {
@@ -49,24 +50,44 @@ func TestPhoenixDriver(t *testing.T) {
 		{
 			Migration: &migration.Migration{
 				ID: "201610041422_init",
-				Up: `CREATE TABLE test_table1 (id integer not null primary key);
+				Up: &parser.ParsedMigration{
+					Statements: []string{
+						`CREATE TABLE test_table1 (id integer not null primary key);
 
-				     CREATE TABLE test_table2 (id integer not null primary key)`,
+				   		 CREATE TABLE test_table2 (id integer not null primary key)`,
+					},
+					UseTransaction: false,
+				},
 			},
 			Direction: migration.Up,
 		},
 		{
 			Migration: &migration.Migration{
-				ID:   "201610041425_drop_unused_table",
-				Up:   "DROP TABLE test_table2",
-				Down: "CREATE TABLE test_table2(id integer not null primary key)",
+				ID: "201610041425_drop_unused_table",
+				Up: &parser.ParsedMigration{
+					Statements: []string{
+						"DROP TABLE test_table2",
+					},
+					UseTransaction: false,
+				},
+				Down: &parser.ParsedMigration{
+					Statements: []string{
+						"CREATE TABLE test_table2(id integer not null primary key)",
+					},
+					UseTransaction: false,
+				},
 			},
 			Direction: migration.Up,
 		},
 		{
 			Migration: &migration.Migration{
 				ID: "201610041422_invalid_sql",
-				Up: "CREATE TABLE test_table3 (some error",
+				Up: &parser.ParsedMigration{
+					Statements: []string{
+						"CREATE TABLE test_table3 (some error",
+					},
+					UseTransaction: false,
+				},
 			},
 			Direction: migration.Up,
 		},

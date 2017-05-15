@@ -61,6 +61,41 @@ We also create a `1_init.down.sql` file containing SQL statements for the down m
 DROP TABLE IF EXISTS test_data
 ```
 
+By default, migrations are run within a transaction. If you do not want a migration to run within a transaction,
+start the migration file with `-- +migration NoTransaction`:
+
+```sql
+-- +migration NoTransaction
+
+CREATE TABLE test_data1 (
+  id BIGINT NOT NULL PRIMARY KEY,
+)
+
+CREATE TABLE test_data2 (
+  id BIGINT NOT NULL PRIMARY KEY,
+)
+```
+
+If you would like to create stored procedures, triggers or complex statements that contain semicolns, use `BeginStatement`
+and `EndStatement` to delineate them:
+
+```sql
+CREATE TABLE test_data1 (
+  id BIGINT NOT NULL PRIMARY KEY,
+)
+
+CREATE TABLE test_data2 (
+  id BIGINT NOT NULL PRIMARY KEY,
+)
+
+-- +migration BeginStatement
+CREATE TRIGGER`test_trigger_1`BEFORE UPDATE ON`test_data1`FOR EACH ROW BEGIN
+		INSERT INTO test_data2
+		SET id = OLD.id;
+END
+-- +migration EndStatement
+```
+
 ## Embedding migration files
 We use [go-bindata](https://github.com/jteeuwen/go-bindata) to embed migration files. In the
 simpliest case, assuming your migration files are in `migrations/`, just run:

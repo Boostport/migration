@@ -3,9 +3,10 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
-	"strings"
 
 	m "github.com/Boostport/migration"
+	"github.com/Boostport/migration/parser"
+	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -19,7 +20,15 @@ const mysqlTableName = "schema_migration"
 // The DSN is documented here: https://github.com/go-sql-driver/mysql#dsn-data-source-name
 func New(dsn string) (m.Driver, error) {
 
-	db, err := sql.Open("mysql", dsn)
+	parsedDSN, err := mysql.ParseDSN(dsn)
+
+	if err != nil {
+		return nil, err
+	}
+
+	parsedDSN.MultiStatements = true
+
+	db, err := sql.Open("mysql", parsedDSN.FormatDSN())
 
 	if err != nil {
 		return nil, err
@@ -57,23 +66,18 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
 	// Note: Driver does not support DDL statements in a transaction. If DDL statements are
 	// executed in a transaction, it is an implicit commit.
 	// See: http://dev.mysql.com/doc/refman/5.7/en/implicit-commit.html
-	var content string
+	var migrationStatements *parser.ParsedMigration
 
 	if migration.Direction == m.Up {
 
-		content = migration.Up
+		migrationStatements = migration.Up
 
 	} else if migration.Direction == m.Down {
 
-		content = migration.Down
+		migrationStatements = migration.Down
 	}
 
-	// Driver does not support multiple statements, so we need to do this.
-	sqlStmts := strings.Split(content, ";")
-
-	for _, sqlStmt := range sqlStmts {
-
-		sqlStmt = strings.TrimSpace(sqlStmt)
+	for _, sqlStmt := range migrationStatements.Statements {
 
 		if len(sqlStmt) > 0 {
 

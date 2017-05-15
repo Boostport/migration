@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/Boostport/migration/parser"
 )
 
 type Direction int
@@ -24,8 +26,8 @@ var numberPrefixRegex = regexp.MustCompile(`^(\d+).*$`)
 // Migration represents a migration, containing statements for migrating up and down.
 type Migration struct {
 	ID   string
-	Up   string
-	Down string
+	Up   *parser.ParsedMigration
+	Down *parser.ParsedMigration
 }
 
 // PlannedMigration is a migration with a direction defined. This allows the driver to
@@ -211,19 +213,25 @@ func getMigrations(migrations Source) ([]*Migration, error) {
 			reader, err := migrations.GetMigrationFile(file)
 
 			if err != nil {
-				return m, err
+				return m, fmt.Errorf("Error getting migrations: %s", err)
 			}
 
 			contents, err := ioutil.ReadAll(reader)
 
 			if err != nil {
-				return m, err
+				return m, fmt.Errorf("Error getting migration content: %s", err)
+			}
+
+			parsed, err := parser.Parse(bytes.NewReader(contents))
+
+			if err != nil {
+				return m, fmt.Errorf("Error parsing migration %s: %s", id, err)
 			}
 
 			if direction == "up" {
-				tempMigrations[id].Up = string(contents)
+				tempMigrations[id].Up = parsed
 			} else {
-				tempMigrations[id].Down = string(contents)
+				tempMigrations[id].Down = parsed
 			}
 		}
 	}
