@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/Boostport/migration/parser"
 )
 
 type mockDriver struct {
@@ -18,15 +20,21 @@ func (m *mockDriver) Close() error {
 
 func (m *mockDriver) Migrate(migration *PlannedMigration) error {
 
-	var content string
+	var migrationStatements *parser.ParsedMigration
 
 	if migration.Direction == Up {
-		content = migration.Up
+		migrationStatements = migration.Up
 	} else {
-		content = migration.Down
+		migrationStatements = migration.Down
 	}
 
-	if strings.Contains(content, "error") {
+	errStatement := ""
+
+	if len(migrationStatements.Statements) > 0 {
+		errStatement = migrationStatements.Statements[0]
+	}
+
+	if strings.Contains(errStatement, "error") {
 		return errors.New("Error executing migration.")
 	}
 

@@ -3,10 +3,12 @@ package phoenix
 import (
 	"database/sql"
 	"fmt"
+
 	"strings"
 
 	_ "github.com/Boostport/avatica"
 	m "github.com/Boostport/migration"
+	"github.com/Boostport/migration/parser"
 )
 
 type Driver struct {
@@ -54,30 +56,32 @@ func (driver *Driver) ensureVersionTableExists() error {
 // Migrate runs a migration.
 func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
 
-	// TODO: Driver does not support DDL statements yet :( See PHOENIX-3358
+	// TODO: Driver does not support DDL statements in a transaction yet :( See PHOENIX-3358
 
-	var content string
+	var migrationStatements *parser.ParsedMigration
 
 	if migration.Direction == m.Up {
 
-		content = migration.Up
+		migrationStatements = migration.Up
 
 	} else if migration.Direction == m.Down {
 
-		content = migration.Down
+		migrationStatements = migration.Down
 	}
 
-	// Driver does not support multiple statements, so we need to do this.
-	sqlStmts := strings.Split(content, ";")
+	for _, sqlStmt := range migrationStatements.Statements {
 
-	for _, sqlStmt := range sqlStmts {
+		// Special case for Phoenix. We force a statement split here, because Phoenix SQL statements must not be terminated with ;.
+		// In addition, this explicitly splits the SQL statements into its constituent statements.
+		splitted := strings.Split(sqlStmt, ";")
 
-		sqlStmt = strings.TrimSpace(sqlStmt)
+		for _, content := range splitted {
 
-		if len(sqlStmt) > 0 {
+			if len(content) > 0 {
 
-			if _, err := driver.db.Exec(sqlStmt); err != nil {
-				return fmt.Errorf("Error executing statement: %s\n%s", err, sqlStmt)
+				if _, err := driver.db.Exec(content); err != nil {
+					return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+				}
 			}
 		}
 	}

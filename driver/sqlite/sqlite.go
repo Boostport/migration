@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	m "github.com/Boostport/migration"
+	"github.com/Boostport/migration/parser"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -56,18 +57,18 @@ func (driver *Driver) ensureVersionTableExists() error {
 func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 	var (
-		content       string
-		insertVersion string
+		migrationStatements *parser.ParsedMigration
+		insertVersion       string
 	)
 
 	if migration.Direction == m.Up {
 
-		content = migration.Up
+		migrationStatements = migration.Up
 		insertVersion = "INSERT INTO " + sqliteTableName + " (version) VALUES (?)"
 
 	} else if migration.Direction == m.Down {
 
-		content = migration.Down
+		migrationStatements = migration.Down
 		insertVersion = "DELETE FROM " + sqliteTableName + " WHERE version=?"
 	}
 
@@ -88,9 +89,12 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 			err = tx.Commit()
 		}()
 
-		if _, err = tx.Exec(content); err != nil {
+		for _, statement := range migrationStatements.Statements {
 
-			return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+			if _, err = tx.Exec(statement); err != nil {
+
+				return fmt.Errorf("Error executing statement: %s\n%s", err, migrationStatements)
+			}
 		}
 
 		if _, err = tx.Exec(insertVersion, migration.ID); err != nil {
@@ -99,9 +103,10 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 		}
 	} else {
 
-		if _, err = driver.db.Exec(content); err != nil {
-
-			return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+		for _, statement := range migrationStatements.Statements {
+			if _, err := driver.db.Exec(statement); err != nil {
+				return fmt.Errorf("Error executing statement: %s\n%s", err, migrationStatements)
+			}
 		}
 
 		if _, err = driver.db.Exec(insertVersion, migration.ID); err != nil {

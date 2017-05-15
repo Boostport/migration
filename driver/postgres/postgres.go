@@ -5,19 +5,19 @@ import (
 	"fmt"
 
 	m "github.com/Boostport/migration"
+	"github.com/Boostport/migration/parser"
 	_ "github.com/lib/pq"
 )
 
 type Driver struct {
-	db              *sql.DB
-	useTransactions bool
+	db *sql.DB
 }
 
 const postgresTableName = "schema_migration"
 
 // NewPostgres creates a new Driver driver.
 // The DSN is documented here: https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
-func New(dsn string, useTransactions bool) (m.Driver, error) {
+func New(dsn string) (m.Driver, error) {
 
 	db, err := sql.Open("postgres", dsn)
 
@@ -30,8 +30,7 @@ func New(dsn string, useTransactions bool) (m.Driver, error) {
 	}
 
 	d := &Driver{
-		db:              db,
-		useTransactions: useTransactions,
+		db: db,
 	}
 
 	if err := d.ensureVersionTableExists(); err != nil {
@@ -56,22 +55,22 @@ func (driver *Driver) ensureVersionTableExists() error {
 func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 	var (
-		content       string
-		insertVersion string
+		migrationStatements *parser.ParsedMigration
+		insertVersion       string
 	)
 
 	if migration.Direction == m.Up {
 
-		content = migration.Up
+		migrationStatements = migration.Up
 		insertVersion = "INSERT INTO " + postgresTableName + " (version) VALUES ($1)"
 
 	} else if migration.Direction == m.Down {
 
-		content = migration.Down
+		migrationStatements = migration.Down
 		insertVersion = "DELETE FROM " + postgresTableName + " WHERE version=$1"
 	}
 
-	if driver.useTransactions {
+	if migrationStatements.UseTransaction {
 
 		tx, err := driver.db.Begin()
 
@@ -89,18 +88,22 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 			err = tx.Commit()
 		}()
 
-		if _, err = tx.Exec(content); err != nil {
-
-			return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+		for _, statement := range migrationStatements.Statements {
+			if _, err = tx.Exec(statement); err != nil {
+				return fmt.Errorf("Error executing statement: %s\n%s", err, migrationStatements)
+			}
 		}
 
 		if _, err = tx.Exec(insertVersion, migration.ID); err != nil {
 			return fmt.Errorf("Error updating migration versions: %s", err)
 		}
+
 	} else {
 
-		if _, err := driver.db.Exec(content); err != nil {
-			return fmt.Errorf("Error executing statement: %s\n%s", err, content)
+		for _, statement := range migrationStatements.Statements {
+			if _, err := driver.db.Exec(statement); err != nil {
+				return fmt.Errorf("Error executing statement: %s\n%s", err, migrationStatements)
+			}
 		}
 
 		if _, err = driver.db.Exec(insertVersion, migration.ID); err != nil {
