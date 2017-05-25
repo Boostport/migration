@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
@@ -79,7 +80,7 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
 
 	for _, sqlStmt := range migrationStatements.Statements {
 
-		if len(sqlStmt) > 0 {
+		if len(strings.TrimSpace(sqlStmt)) > 0 {
 
 			if _, err := driver.db.Exec(sqlStmt); err != nil {
 				return fmt.Errorf("Error executing statement: %s\n%s", err, sqlStmt)
