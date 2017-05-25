@@ -3,7 +3,6 @@ package phoenix
 import (
 	"database/sql"
 	"fmt"
-
 	"strings"
 
 	_ "github.com/Boostport/avatica"
@@ -77,7 +76,7 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
 
 		for _, content := range splitted {
 
-			if len(content) > 0 {
+			if len(strings.TrimSpace(content)) > 0 {
 
 				if _, err := driver.db.Exec(content); err != nil {
 					return fmt.Errorf("Error executing statement: %s\n%s", err, content)
