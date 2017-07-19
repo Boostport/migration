@@ -5,7 +5,7 @@ box:
 no-response-timeout: 20
 
 services:
-  - boostport/hbase-phoenix-all-in-one:1.2-4.10
+  - boostport/hbase-phoenix-all-in-one:1.2-4.11
   - id: mysql:5
     env:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -32,17 +32,17 @@ build:
         apk --no-cache --no-progress add build-base
     # Gets the dependencies
     - script:
-      name: go vendor
+      name: get dependencies
       code: |
         apk update
         apk add git
-        go get -u github.com/kardianos/govendor
-        govendor sync
+        go get -u github.com/golang/dep/cmd/dep
+        dep ensure
     # Build the project
     - script:
         name: go build
         code: |
-          go build ./...
+          go build
     # Test the project
     - script:
         name: go test

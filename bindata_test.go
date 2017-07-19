@@ -88,7 +88,7 @@ func testMigrations1_initDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/1_init.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475705909, 0)}
+	info := bindataFileInfo{name: "test-migrations/1_init.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475809013, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -108,7 +108,7 @@ func testMigrations1_initUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/1_init.up.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475705882, 0)}
+	info := bindataFileInfo{name: "test-migrations/1_init.up.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475809013, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -128,7 +128,7 @@ func testMigrations2_updateDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/2_update.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475705926, 0)}
+	info := bindataFileInfo{name: "test-migrations/2_update.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475809013, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -148,7 +148,7 @@ func testMigrations2_updateUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/2_update.up.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475705918, 0)}
+	info := bindataFileInfo{name: "test-migrations/2_update.up.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475809013, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -168,7 +168,7 @@ func testMigrations3_add_columnDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/3_add_column.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475718235, 0)}
+	info := bindataFileInfo{name: "test-migrations/3_add_column.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475809013, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -188,7 +188,7 @@ func testMigrations3_add_columnUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/3_add_column.up..sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475718246, 0)}
+	info := bindataFileInfo{name: "test-migrations/3_add_column.up..sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1475809013, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -245,12 +245,12 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"test-migrations/1_init.down.sql":       testMigrations1_initDownSql,
-	"test-migrations/1_init.up.sql":         testMigrations1_initUpSql,
-	"test-migrations/2_update.down.sql":     testMigrations2_updateDownSql,
-	"test-migrations/2_update.up.sql":       testMigrations2_updateUpSql,
+	"test-migrations/1_init.down.sql": testMigrations1_initDownSql,
+	"test-migrations/1_init.up.sql": testMigrations1_initUpSql,
+	"test-migrations/2_update.down.sql": testMigrations2_updateDownSql,
+	"test-migrations/2_update.up.sql": testMigrations2_updateUpSql,
 	"test-migrations/3_add_column.down.sql": testMigrations3_add_columnDownSql,
-	"test-migrations/3_add_column.up..sql":  testMigrations3_add_columnUpSql,
+	"test-migrations/3_add_column.up..sql": testMigrations3_add_columnUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -292,15 +292,14 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
-
 var _bintree = &bintree{nil, map[string]*bintree{
 	"test-migrations": &bintree{nil, map[string]*bintree{
-		"1_init.down.sql":       &bintree{testMigrations1_initDownSql, map[string]*bintree{}},
-		"1_init.up.sql":         &bintree{testMigrations1_initUpSql, map[string]*bintree{}},
-		"2_update.down.sql":     &bintree{testMigrations2_updateDownSql, map[string]*bintree{}},
-		"2_update.up.sql":       &bintree{testMigrations2_updateUpSql, map[string]*bintree{}},
+		"1_init.down.sql": &bintree{testMigrations1_initDownSql, map[string]*bintree{}},
+		"1_init.up.sql": &bintree{testMigrations1_initUpSql, map[string]*bintree{}},
+		"2_update.down.sql": &bintree{testMigrations2_updateDownSql, map[string]*bintree{}},
+		"2_update.up.sql": &bintree{testMigrations2_updateUpSql, map[string]*bintree{}},
 		"3_add_column.down.sql": &bintree{testMigrations3_add_columnDownSql, map[string]*bintree{}},
-		"3_add_column.up..sql":  &bintree{testMigrations3_add_columnUpSql, map[string]*bintree{}},
+		"3_add_column.up..sql": &bintree{testMigrations3_add_columnUpSql, map[string]*bintree{}},
 	}},
 }}
 
@@ -350,3 +349,4 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
+
