@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/Boostport/avatica"
   packages = [".","message"]
-  revision = "3bf4fde3396f8cf3e864289a6c45c41725dcbf15"
-  version = "v2.0.0"
+  revision = "01697f27dd697b864871a11685b7efe4d6ab2e9e"
+  version = "v2.1.0"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
@@ -63,17 +63,17 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["pbkdf2"]
-  revision = "7f7c0c2d75ebb4e32a21396ce36e87b6dadc91c9"
+  revision = "4bc1c249b153ce1da9f55437759cec51fe6acabb"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp"]
-  revision = "5d0d7096b5f2ef7ba83f319c07ef63989a1c6f91"
+  revision = "02ac38e2528ff4adea90f184d71a3faa04b4b1b0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5ffef752c2dfe06c6179b931d900ddc54568f72ad1bb70215c690687884b1963"
+  inputs-digest = "a0f573373b27c6185300cabb1d69958705dc0db21b6e17ad7589950b9f85c309"
   solver-name = "gps-cdcl"
   solver-version = 1
