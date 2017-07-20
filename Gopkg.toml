@@ -23,7 +23,7 @@
 
 [[constraint]]
   name = "github.com/Boostport/avatica"
-  version = "2.0.0"
+  version = "2.1.0"
 
 [[constraint]]
   name = "github.com/go-sql-driver/mysql"
