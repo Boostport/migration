@@ -1,11 +1,14 @@
 package sqlite
 
 import (
+	"database/sql"
 	"regexp"
 	"testing"
 
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
+	"github.com/DATA-DOG/go-sqlmock"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func TestSQLiteDriver(t *testing.T) {
@@ -138,4 +141,36 @@ func TestSQLiteDriver(t *testing.T) {
 
 		driver.Close()
 	}
+}
+
+func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
+
+	db, _, err := sqlmock.New()
+
+	if err != nil {
+		t.Fatalf("Error opening stub database connection: %s", err)
+	}
+
+	_, err = NewFromDB(db)
+
+	if err == nil {
+		t.Error("Expected error when creating SQLite driver with a non-SQLite database instance, but there was no error")
+	}
+}
+
+func TestCreateDriverUsingDBInstance(t *testing.T) {
+
+	db, err := sql.Open("sqlite3", "file::memory:?cache=shared&_busy_timeout=50000")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	driver, err := NewFromDB(db)
+
+	if err != nil {
+		t.Errorf("Unable to create SQLite driver: %s", err)
+	}
+
+	defer driver.Close()
 }

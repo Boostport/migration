@@ -2,11 +2,12 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 type Driver struct {
@@ -23,6 +24,27 @@ func New(dsn string) (m.Driver, error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
+	d := &Driver{
+		db: db,
+	}
+
+	if err := d.ensureVersionTableExists(); err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}
+
+func NewFromDB(db *sql.DB) (m.Driver, error) {
+
+	if _, ok := db.Driver().(*pq.Driver); !ok {
+		return nil, errors.New("database instance is not using the postgres driver")
 	}
 
 	if err := db.Ping(); err != nil {
