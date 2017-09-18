@@ -7,6 +7,7 @@ import (
 
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/lib/pq"
 )
 
@@ -23,17 +24,25 @@ func TestPostgresDriver(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	defer connection.Close()
+
 	_, err = connection.Exec("CREATE DATABASE " + database)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	defer func() {
+		connection.Exec("DROP DATABASE IF EXISTS " + database)
+	}()
+
 	connection2, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/"+database+"?sslmode=disable")
 
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	defer connection2.Close()
 
 	driver, err := New("postgres://postgres:@" + postgresHost + "/" + database + "?sslmode=disable")
 
@@ -155,14 +164,59 @@ func TestPostgresDriver(t *testing.T) {
 	}
 
 	driver.Close()
+}
 
-	connection2.Close()
+func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
 
-	_, err = connection.Exec("DROP DATABASE IF EXISTS " + database)
+	db, _, err := sqlmock.New()
 
 	if err != nil {
-		t.Errorf("Error dropping test database: %s", err)
+		t.Fatalf("Error opening stub database connection: %s", err)
 	}
 
-	connection.Close()
+	_, err = NewFromDB(db)
+
+	if err == nil {
+		t.Error("Expected error when creating Postgres driver with a non-Postgres database instance, but there was no error")
+	}
+}
+
+func TestCreateDriverUsingDBInstance(t *testing.T) {
+
+	postgresHost := os.Getenv("POSTGRES_HOST")
+
+	database := "migrationtest"
+
+	// prepare clean database
+	connection, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/?sslmode=disable")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer connection.Close()
+
+	_, err = connection.Exec("CREATE DATABASE " + database)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		connection.Exec("DROP DATABASE IF EXISTS " + database)
+	}()
+
+	db, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/"+database+"?sslmode=disable")
+
+	if err != nil {
+		t.Fatalf("Could not open Postgres connection: %s", err)
+	}
+
+	driver, err := NewFromDB(db)
+
+	if err != nil {
+		t.Errorf("Unable to create Postgres driver: %s", err)
+	}
+
+	defer driver.Close()
 }

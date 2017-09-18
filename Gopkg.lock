@@ -8,6 +8,12 @@
   version = "v2.1.0"
 
 [[projects]]
+  name = "github.com/DATA-DOG/go-sqlmock"
+  packages = ["."]
+  revision = "b983233bc0bbea4dc6e8ec8c8c923d935765ffec"
+  version = "v1.2.0"
+
+[[projects]]
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
   revision = "a0583e0143b1624142adab07e0e97fe106d99561"
@@ -74,6 +80,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a0f573373b27c6185300cabb1d69958705dc0db21b6e17ad7589950b9f85c309"
+  inputs-digest = "b3680ea86e050d60f73a5d7d42918c4a9819ddd8ed9733521e5168b4abba936f"
   solver-name = "gps-cdcl"
   solver-version = 1

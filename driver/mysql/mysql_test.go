@@ -7,6 +7,7 @@ import (
 
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -161,4 +162,58 @@ func TestMySQLDriver(t *testing.T) {
 	if len(versions) != 1 {
 		t.Errorf("Expected %d versions to be applied, %d was actually applied.", 2, len(versions))
 	}
+}
+
+func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
+
+	db, _, err := sqlmock.New()
+
+	if err != nil {
+		t.Fatalf("Error opening stub database connection: %s", err)
+	}
+
+	_, err = NewFromDB(db)
+
+	if err == nil {
+		t.Error("Expected error when creating MySQL driver with a non-MySQL database instance, but there was no error")
+	}
+}
+
+func TestCreateDriverUsingDBInstance(t *testing.T) {
+	mysqlHost := os.Getenv("MYSQL_HOST")
+
+	database := "migrationtest"
+
+	// prepare clean database
+	connection, err := sql.Open("mysql", "root:@tcp("+mysqlHost+")/")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = connection.Exec("CREATE DATABASE IF NOT EXISTS " + database)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer connection.Close()
+
+	defer func() {
+		connection.Exec("DROP DATABASE IF EXISTS " + database)
+	}()
+
+	db, err := sql.Open("mysql", "root:@tcp("+mysqlHost+")/"+database+"?multiStatements=true")
+
+	if err != nil {
+		t.Fatalf("Could not open MySQL connection: %s", err)
+	}
+
+	driver, err := NewFromDB(db)
+
+	if err != nil {
+		t.Errorf("Unable to create MySQL driver: %s", err)
+	}
+
+	defer driver.Close()
 }

@@ -2,10 +2,11 @@ package phoenix
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
-	_ "github.com/Boostport/avatica"
+	"github.com/Boostport/avatica"
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
 )
@@ -39,6 +40,27 @@ func New(dsn string) (m.Driver, error) {
 	}
 
 	return p, nil
+}
+
+func NewFromDB(db *sql.DB) (m.Driver, error) {
+
+	if _, ok := db.Driver().(*avatica.Driver); !ok {
+		return nil, errors.New("database instance is not using the avatica driver")
+	}
+
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
+	d := &Driver{
+		db: db,
+	}
+
+	if err := d.ensureVersionTableExists(); err != nil {
+		return nil, err
+	}
+
+	return d, nil
 }
 
 // Close closes the connection to the Apache Driver server.

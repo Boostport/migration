@@ -36,3 +36,7 @@
 [[constraint]]
   name = "github.com/mattn/go-sqlite3"
   version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/DATA-DOG/go-sqlmock"
+  version = "1.2.0"

@@ -8,6 +8,7 @@ import (
 	"github.com/Boostport/avatica"
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
+	"github.com/DATA-DOG/go-sqlmock"
 )
 
 func TestPhoenixDriver(t *testing.T) {
@@ -158,4 +159,59 @@ func TestPhoenixDriver(t *testing.T) {
 	if len(versions) != 1 {
 		t.Errorf("Expected %d versions to be applied, %d was actually applied.", 2, len(versions))
 	}
+}
+
+func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
+
+	db, _, err := sqlmock.New()
+
+	if err != nil {
+		t.Fatalf("Error opening stub database connection: %s", err)
+	}
+
+	_, err = NewFromDB(db)
+
+	if err == nil {
+		t.Error("Expected error when creating Phoenix driver with a non-Phoenix database instance, but there was no error")
+	}
+}
+
+func TestCreateDriverUsingDBInstance(t *testing.T) {
+	phoenixHost := os.Getenv("PHOENIX_HOST")
+
+	// prepare clean database
+	connection, err := sql.Open("avatica", phoenixHost)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer connection.Close()
+
+	schema := "migrationtest"
+
+	_, err = connection.Exec("CREATE SCHEMA IF NOT EXISTS " + schema)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		connection.Exec("DROP TABLE IF EXISTS schema_migration")
+		connection.Exec("DROP SCHEMA IF EXISTS " + schema)
+	}()
+
+	db, err := sql.Open("avatica", phoenixHost+"/")
+
+	if err != nil {
+		t.Fatalf("Could not open avatica connection: %s", err)
+	}
+
+	driver, err := NewFromDB(db)
+
+	if err != nil {
+		t.Errorf("Unable to create Avatica driver: %s", err)
+	}
+
+	defer driver.Close()
 }
