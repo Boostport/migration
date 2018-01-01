@@ -138,7 +138,7 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 // Versions lists all the applied versions.
 func (driver *Driver) Versions() ([]string, error) {
-	versions := []string{}
+	var versions []string
 
 	rows, err := driver.db.Query("SELECT version FROM " + postgresTableName + " ORDER BY version DESC")
 

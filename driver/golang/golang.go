@@ -75,7 +75,7 @@ func (s *Source) getMigration(file string) func(c *Config) error {
 
 // ListMigrationFiles lists the available migrations in the source
 func (s *Source) ListMigrationFiles() ([]string, error) {
-	keys := []string{}
+	var keys []string
 
 	s.Lock()
 	defer s.Unlock()

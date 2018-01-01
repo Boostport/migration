@@ -83,7 +83,7 @@ func TestGolangDriver(t *testing.T) {
 			return []string{}, errors.New("versions is not in config map")
 		}
 
-		keys := []string{}
+		var keys []string
 
 		for version := range versions.(map[string]struct{}) {
 			keys = append(keys, version)
