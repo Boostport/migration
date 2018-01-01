@@ -30,18 +30,22 @@ func TestParser(t *testing.T) {
 				CREATE TABLE test_table3 (id integer not null primary key);
 				`,
 			result: []string{
-				`CREATE TABLE test_table1 (id integer not null primary key);
-CREATE TABLE test_table2 (id integer not null primary key);
+				`
+				CREATE TABLE test_table1 (id integer not null primary key);
+
+				CREATE TABLE test_table2 (id integer not null primary key);
+
 `,
 
-				`CREATE TRIGGER ` + "`test_trigger`" + ` BEFORE UPDATE ON ` + "`test_table1`" + ` FOR EACH ROW BEGIN
-INSERT INTO test_table2
-SET id = OLD.id;
-END
+				`				CREATE TRIGGER ` + "`test_trigger`" + ` BEFORE UPDATE ON ` + "`test_table1`" + ` FOR EACH ROW BEGIN
+				    INSERT INTO test_table2
+				    SET id = OLD.id;
+				END
 `,
 
-				`CREATE TABLE test_table3 (id integer not null primary key);
-`,
+				`
+				CREATE TABLE test_table3 (id integer not null primary key);
+				`,
 			},
 
 			transaction: true,
@@ -62,14 +66,17 @@ END
 				`,
 
 			result: []string{
-				`CREATE TABLE test_table1 (id integer not null primary key);
-CREATE TABLE test_table2 (id integer not null primary key);
+				`
+				CREATE TABLE test_table1 (id integer not null primary key);
+
+				CREATE TABLE test_table2 (id integer not null primary key);
+
 `,
 
-				`CREATE TRIGGER ` + "`test_trigger`" + ` BEFORE UPDATE ON ` + "`test_table1`" + ` FOR EACH ROW BEGIN
-INSERT INTO test_table2
-SET id = OLD.id;
-END
+				`				CREATE TRIGGER ` + "`test_trigger`" + ` BEFORE UPDATE ON ` + "`test_table1`" + ` FOR EACH ROW BEGIN
+				    INSERT INTO test_table2
+				    SET id = OLD.id;
+				END
 `,
 			},
 
@@ -77,8 +84,7 @@ END
 		},
 
 		{
-			statements: `
-				-- +migration NoTransaction
+			statements: `-- +migration NoTransaction
 
 				CREATE TABLE test_table1 (id integer not null primary key);
 
@@ -95,20 +101,24 @@ END
 				`,
 
 			result: []string{
-				`CREATE TABLE test_table1 (id integer not null primary key);
+				`
+				CREATE TABLE test_table1 (id integer not null primary key);`,
+
+				`
+
+				CREATE TABLE test_table2 (id integer not null primary key);
+
 `,
 
-				`CREATE TABLE test_table2 (id integer not null primary key);
+				`				CREATE TRIGGER ` + "`test_trigger`" + ` BEFORE UPDATE ON ` + "`test_table1`" + ` FOR EACH ROW BEGIN
+				    INSERT INTO test_table2
+				    SET id = OLD.id;
+				END
 `,
 
-				`CREATE TRIGGER ` + "`test_trigger`" + ` BEFORE UPDATE ON ` + "`test_table1`" + ` FOR EACH ROW BEGIN
-INSERT INTO test_table2
-SET id = OLD.id;
-END
-`,
-
-				`CREATE TABLE test_table3 (id integer not null primary key);
-`,
+				`
+				CREATE TABLE test_table3 (id integer not null primary key);
+				`,
 			},
 
 			transaction: false,

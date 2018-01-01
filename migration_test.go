@@ -73,43 +73,43 @@ func getMockDriver() *mockDriver {
 func TestMigrationSorting(t *testing.T) {
 
 	unsorted := []*Migration{
-		&Migration{
+		{
 			ID: "1475461906_remove_name_column",
 		},
-		&Migration{
+		{
 			ID: "1375461906_init",
 		},
-		&Migration{
+		{
 			ID: "1575461906_remove_users_table",
 		},
-		&Migration{
+		{
 			ID: "1475461916_add_sales_table",
 		},
-		&Migration{
+		{
 			ID: "1475461904442_remove_subscriptions_table",
 		},
-		&Migration{
+		{
 			ID: "1475461904_add_last_name_column",
 		},
 	}
 
 	sorted := []*Migration{
-		&Migration{
+		{
 			ID: "1375461906_init",
 		},
-		&Migration{
+		{
 			ID: "1475461904_add_last_name_column",
 		},
-		&Migration{
+		{
 			ID: "1475461906_remove_name_column",
 		},
-		&Migration{
+		{
 			ID: "1475461916_add_sales_table",
 		},
-		&Migration{
+		{
 			ID: "1575461906_remove_users_table",
 		},
-		&Migration{
+		{
 			ID: "1475461904442_remove_subscriptions_table",
 		},
 	}
@@ -124,43 +124,43 @@ func TestMigrationSorting(t *testing.T) {
 func TestMigrationSortingWithNonNumericIds(t *testing.T) {
 
 	unsorted := []*Migration{
-		&Migration{
+		{
 			ID: "b_init",
 		},
-		&Migration{
+		{
 			ID: "a_remove_users_table",
 		},
-		&Migration{
+		{
 			ID: "d_remove_users_table",
 		},
-		&Migration{
+		{
 			ID: "147546_add_sales_table",
 		},
-		&Migration{
+		{
 			ID: "c_remove_users_table",
 		},
-		&Migration{
+		{
 			ID: "1_remove_name_column",
 		},
 	}
 
 	sorted := []*Migration{
-		&Migration{
+		{
 			ID: "1_remove_name_column",
 		},
-		&Migration{
+		{
 			ID: "147546_add_sales_table",
 		},
-		&Migration{
+		{
 			ID: "a_remove_users_table",
 		},
-		&Migration{
+		{
 			ID: "b_init",
 		},
-		&Migration{
+		{
 			ID: "c_remove_users_table",
 		},
-		&Migration{
+		{
 			ID: "d_remove_users_table",
 		},
 	}

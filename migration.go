@@ -117,7 +117,7 @@ type MemoryMigrationSource struct {
 
 func (m MemoryMigrationSource) ListMigrationFiles() ([]string, error) {
 
-	files := []string{}
+	var files []string
 
 	for file := range m.Files {
 		files = append(files, file)
@@ -183,7 +183,7 @@ func Migrate(driver Driver, migrations Source, direction Direction, max int) (in
 
 func getMigrations(migrations Source) ([]*Migration, error) {
 
-	m := []*Migration{}
+	var m []*Migration
 
 	tempMigrations := map[string]*Migration{}
 
@@ -247,7 +247,7 @@ func getMigrations(migrations Source) ([]*Migration, error) {
 
 func planMigrations(migrations []*Migration, appliedMigrations []string, direction Direction, max int) []*PlannedMigration {
 
-	applied := []*Migration{}
+	var applied []*Migration
 
 	for _, appliedMigration := range appliedMigrations {
 		applied = append(applied, &Migration{
@@ -264,7 +264,7 @@ func planMigrations(migrations []*Migration, appliedMigrations []string, directi
 		record = applied[len(applied)-1]
 	}
 
-	result := []*PlannedMigration{}
+	var result []*PlannedMigration
 
 	// Add missing migrations up to the last run migration.
 	// This can happen for example when merges happened.
@@ -332,7 +332,7 @@ func toApply(migrations []*Migration, current string, direction Direction) []*Mi
 // Get migrations that we need to apply regardless of whether the direction is up or down. This is
 // because there may be migration "holes" due to merges.
 func toCatchup(migrations, existingMigrations []*Migration, lastRun *Migration) []*PlannedMigration {
-	missing := []*PlannedMigration{}
+	var missing []*PlannedMigration
 
 	for _, migration := range migrations {
 		found := false
