@@ -12,7 +12,7 @@ services:
       - "3306"
 
   - id: postgres
-    image: postgres:9
+    image: postgres:10-alpine
     ports:
       - "5432"
 dev:

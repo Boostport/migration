@@ -9,7 +9,7 @@ services:
   - id: mysql:5
     env:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
-  - postgres:9
+  - postgres:10-alpine
 build:
   steps:
 
