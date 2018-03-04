@@ -115,7 +115,7 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 			if _, err = tx.Exec(statement); err != nil {
 
-				return fmt.Errorf("Error executing statement: %s\n%s", err, migrationStatements)
+				return fmt.Errorf("Error executing statement: %s\n%s", err, statement)
 			}
 		}
 
@@ -127,7 +127,7 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 		for _, statement := range migrationStatements.Statements {
 			if _, err := driver.db.Exec(statement); err != nil {
-				return fmt.Errorf("Error executing statement: %s\n%s", err, migrationStatements)
+				return fmt.Errorf("Error executing statement: %s\n%s", err, statement)
 			}
 		}
 
