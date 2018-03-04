@@ -7,8 +7,8 @@
     ".",
     "message"
   ]
-  revision = "883c441ffc39639304c8722f2514d53bcdb2a058"
-  version = "v2.2.5"
+  revision = "4243a38b8e3aa0aa9d09aec2e25133f19aa11439"
+  version = "v2.3.1"
 
 [[projects]]
   name = "github.com/DATA-DOG/go-sqlmock"
@@ -38,7 +38,7 @@
   branch = "master"
   name = "github.com/hashicorp/go-uuid"
   packages = ["."]
-  revision = "64130c7a86d732268a38cb04cfbaf0cc987fda98"
+  revision = "27454136f0364f2d44b1276c552d69105cf8c498"
 
 [[projects]]
   branch = "master"
@@ -65,10 +65,10 @@
   version = "v1.6.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/satori/go.uuid"
   packages = ["."]
-  revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
-  version = "v1.2.0"
+  revision = "36e9d2ebbde5e3f13ab2e25625fd453271d6522e"
 
 [[projects]]
   name = "github.com/xinsnake/go-http-digest-auth-client"
@@ -83,7 +83,7 @@
     "md4",
     "pbkdf2"
   ]
-  revision = "1875d0a70c90e57f11972aefd42276df65e895b9"
+  revision = "91a49db82a88618983a78a06c1cbd4e00ab749ab"
 
 [[projects]]
   branch = "master"
@@ -92,7 +92,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "2fb46b16b8dda405028c50f7c7f0f9dd1fa6bfb1"
+  revision = "22ae77b79946ea320088417e4d50825671d82d57"
 
 [[projects]]
   name = "gopkg.in/jcmturner/aescts.v1"
@@ -141,12 +141,12 @@
     "pac",
     "types"
   ]
-  revision = "48dba5ef0aac5a0737948e1f2d38ff71880f0a72"
-  version = "v4.1.0"
+  revision = "4f6bed961aa8e808136b8fd9de87cf47d3a77050"
+  version = "v4.1.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c0eb7c045d9cada59c4ad73e1b69daa99b2dcee94f7ffece65a094216376de0b"
+  inputs-digest = "856754be341f5fc40efe207a993230ad408dec55a9eee7155ca708b01301320e"
   solver-name = "gps-cdcl"
   solver-version = 1

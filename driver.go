@@ -2,7 +2,6 @@ package migration
 
 // Driver is the interface type that needs to implemented by all drivers.
 type Driver interface {
-
 	// Close is the last function to be called.
 	// Close any open connection here.
 	Close() error
