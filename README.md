@@ -44,6 +44,7 @@ Migrations are extremely simple to write:
 - Prefix your migration with a number or timestamp for versioning: `1_init.up.sql` or `1475813115_init.up.sql`.
 - The file-extension can be anything you want, but must be present. For example, `1_init.up.sql` is valid, but
 `1_init.up` is not,
+- Note: Underscores (`_`) must be used to separate the number and description in the filename.
 
 Let's say we want to write our first migration to initialize the database.
 
