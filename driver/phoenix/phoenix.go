@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Boostport/avatica"
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
+	"github.com/apache/calcite-avatica-go"
 )
 
 type Driver struct {
@@ -17,8 +17,8 @@ type Driver struct {
 
 const phoenixTableName = "schema_migration"
 
-// New creates a new Apache Driver driver.
-// The DSN is documented here: https://github.com/Boostport/avatica#dsn-data-source-name
+// New creates a new Apache Avatica Driver.
+// The DSN is documented here: https://calcite.apache.org/avatica/docs/go_client_reference.html#dsn-data-source-name
 func New(dsn string) (m.Driver, error) {
 
 	db, err := sql.Open("avatica", dsn)

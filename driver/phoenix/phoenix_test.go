@@ -5,10 +5,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Boostport/avatica"
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/apache/calcite-avatica-go/errors"
 )
 
 func TestPhoenixDriver(t *testing.T) {
@@ -119,7 +119,7 @@ func TestPhoenixDriver(t *testing.T) {
 	}
 
 	if _, err = connection.Exec("UPSERT INTO test_table2 (id) values (1)"); err != nil {
-		if err.(avatica.ResponseError).Name() != "table_undefined" {
+		if err.(errors.ResponseError).Name != "table_undefined" {
 			t.Errorf("Received an error while inserting into a non-existent table, but it was not a table_undefined error: %s", err)
 		}
 	} else {
