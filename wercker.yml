@@ -5,7 +5,7 @@ box:
 no-response-timeout: 20
 
 services:
-  - boostport/hbase-phoenix-all-in-one:1.3-4.13
+  - boostport/hbase-phoenix-all-in-one:1.4-4.14
   - id: mysql:5
     env:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -14,8 +14,6 @@ build:
   steps:
 
     - setup-go-workspace
-
-    # Set up enviroment variable
     - script:
         name: set up environment variables
         code: |
@@ -25,12 +23,10 @@ build:
     - script:
         code: |
           env
-    # Set up cgo build tools
     - script:
       name: set up cgo build tools
       code: |
         apk --no-cache --no-progress add build-base
-    # Gets the dependencies
     - script:
       name: get dependencies
       code: |
