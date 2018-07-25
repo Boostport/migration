@@ -22,20 +22,18 @@ Simple and pragmatic migrations for Go applications.
 ## Quickstart
 ```go
 // Create migration source
-assetMigration := &migration.AssetMigrationSource{
-    Asset:    Asset,
-    AssetDir: AssetDir,
-    Dir:      "test-migrations",
+packrSource := &migration.PackrMigrationSource{
+    Box: packr.NewBox("migrations"),
 }
 
 // Create driver
 driver, err := phoenix.New("http://localhost:8765")
 
 // Run all up migrations
-applied, err := Migrate(driver, assetMigration, migration.Up, 0)
+applied, err := Migrate(driver, packrSource, migration.Up, 0)
 
 // Remove the last 2 migrations
-applied, err := Migrate(driver, assetMigration, migration.Down, 2)
+applied, err := Migrate(driver, packrSource, migration.Down, 2)
 ```
 
 ## Writing migrations
@@ -98,15 +96,38 @@ END
 ```
 
 ## Embedding migration files
-We use [go-bindata](https://github.com/jteeuwen/go-bindata) to embed migration files. In the
-simpliest case, assuming your migration files are in `migrations/`, just run:
+
+### Using [packr](https://github.com/gobuffalo/packr)
+Assuming your migration files are in `migrations/`, initialize a `PackrMigrationSource`:
+```go
+packrSource := &migration.PackrMigrationSource{
+	Box: packr.NewBox("migrations"),
+}
+```
+
+If your migrations are contained in a subdirectory inside your packr box, you can point to it using the `Dir` property:
+```go
+packrSource := &migration.PackrMigrationSource{
+	Box: packr.NewBox("."),
+	Dir: "migrations",
+}
+```
+
+During development, packr will read the migration files from disk. When building for production, run `packr` to generate
+a Go file containing your migrations, or use `packr build` to build for your binary. For more information, see the
+[packr documenation](https://github.com/gobuffalo/packr#building-a-binary-the-easy-way).
+
+### Using [go-bindata](https://github.com/go-bindata/go-bindata)
+*Note: We recommend using packr as it allows you to use migrations from disk during development*
+
+In the simplest case, assuming your migration files are in `migrations/`, just run:
 ```
 go-bindata -o bindata.go -pkg myapp migrations/
 ```
 
-Then, use `AssetMigrationSource` to find the migrations:
+Then, use `GoBindataMigrationSource` to find the migrations:
 ```go
-assetMigration := &migration.AssetMigrationSource{
+goBindataSource := &migration.GoBindataMigrationSource{
     Asset:    Asset,
     AssetDir: AssetDir,
     Dir:      "test-migrations",
@@ -173,7 +194,6 @@ count, err = migration.Migrate(driver, source, migration.Up, 0)
 
 ## TODO (Pull requests welcomed!)
 - [ ] Command line program to run migrations
-- [ ] MigrationSource that uses migrations from the local file system
 - [ ] More drivers
 
 ## Why yet another migration library?

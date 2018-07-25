@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/Boostport/migration/parser"
+	"github.com/gobuffalo/packr"
 )
 
 type mockDriver struct {
@@ -172,9 +173,9 @@ func TestMigrationSortingWithNonNumericIds(t *testing.T) {
 	}
 }
 
-func TestAssetMigrationSource(t *testing.T) {
+func TestGobinDataMigrationSource(t *testing.T) {
 
-	assetMigration := &AssetMigrationSource{
+	assetMigration := &GoBindataMigrationSource{
 		Asset:    Asset,
 		AssetDir: AssetDir,
 		Dir:      "test-migrations",
@@ -185,7 +186,54 @@ func TestAssetMigrationSource(t *testing.T) {
 	applied, err := Migrate(driver, assetMigration, Up, 0)
 
 	if err != nil {
-		t.Errorf("Unexpected error while performing asset migration: %s", err)
+		t.Errorf("Unexpected error while performing go-bindata migration: %s", err)
+	}
+
+	if applied != 3 {
+		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
+	}
+
+	if len(driver.applied) != 3 {
+		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
+	}
+}
+
+func TestPackrMigrationSource(t *testing.T) {
+
+	assetMigration := &PackrMigrationSource{
+		Box: packr.NewBox("."),
+		Dir:      "test-migrations",
+	}
+
+	driver := getMockDriver()
+
+	applied, err := Migrate(driver, assetMigration, Up, 0)
+
+	if err != nil {
+		t.Errorf("Unexpected error while performing packr migration: %s", err)
+	}
+
+	if applied != 3 {
+		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
+	}
+
+	if len(driver.applied) != 3 {
+		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
+	}
+}
+
+func TestPackrMigrationSourceWithoutDir(t *testing.T) {
+
+	assetMigration := &PackrMigrationSource{
+		Box: packr.NewBox("test-migrations"),
+	}
+
+	driver := getMockDriver()
+
+	applied, err := Migrate(driver, assetMigration, Up, 0)
+
+	if err != nil {
+		t.Errorf("Unexpected error while performing packr migration: %s", err)
 	}
 
 	if applied != 3 {
