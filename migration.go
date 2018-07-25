@@ -1,17 +1,20 @@
 package migration
 
 import (
-	"bytes"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"path"
-	"regexp"
-	"sort"
-	"strconv"
-	"strings"
+"bytes"
+"fmt"
+"io/ioutil"
+"regexp"
+"sort"
+"strconv"
 
-	"github.com/Boostport/migration/parser"
+
+
+
+
+
+
+"github.com/Boostport/migration/parser"
 )
 
 type Direction int
@@ -74,68 +77,6 @@ type byID []*Migration
 func (b byID) Len() int           { return len(b) }
 func (b byID) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
 func (b byID) Less(i, j int) bool { return b[i].Less(b[j]) }
-
-// Source is an interface that defines how a source can find and read migration files.
-type Source interface {
-	ListMigrationFiles() ([]string, error)
-	GetMigrationFile(file string) (io.Reader, error)
-}
-
-// AssetMigrationSource is a MigrationSource that uses migration files embedded in a Go application.
-type AssetMigrationSource struct {
-	// Asset should return content of file in path if exists
-	Asset func(path string) ([]byte, error)
-
-	// AssetDir should return list of files in the path
-	AssetDir func(path string) ([]string, error)
-
-	// Path in the bindata to use.
-	Dir string
-}
-
-func (a AssetMigrationSource) ListMigrationFiles() ([]string, error) {
-
-	return a.AssetDir(a.Dir)
-}
-
-func (a AssetMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
-
-	file, err := a.Asset(path.Join(a.Dir, name))
-
-	if err != nil {
-		return nil, err
-	}
-
-	return bytes.NewReader(file), nil
-}
-
-// MemoryMigrationSource is a MigrationSource that uses migration sources in memory. It is mainly
-// used for testing.
-type MemoryMigrationSource struct {
-	Files map[string]string
-}
-
-func (m MemoryMigrationSource) ListMigrationFiles() ([]string, error) {
-
-	var files []string
-
-	for file := range m.Files {
-		files = append(files, file)
-	}
-
-	return files, nil
-}
-
-func (m MemoryMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
-
-	content, ok := m.Files[name]
-
-	if !ok {
-		return nil, fmt.Errorf("The migration file %s does not exist.", name)
-	}
-
-	return strings.NewReader(content), nil
-}
 
 // Migrate runs a migration using a given driver and MigrationSource. The direction defines whether
 // the migration is up or down, and max is the maximum number of migrations to apply. If max is set to 0,

@@ -2,12 +2,15 @@
 
 
 [[projects]]
+  digest = "1:04aea75705cb453e24bf8c1506a24a5a9036537dbc61ddf71d20900d6c7c3ab9"
   name = "github.com/DATA-DOG/go-sqlmock"
   packages = ["."]
+  pruneopts = "UT"
   revision = "d76b18b42f285b792bf985118980ce9eacea9d10"
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:aca370638eabc3d08a1367d6b3a9c41f92c8206842efb7924de01f5ac0482def"
   name = "github.com/apache/calcite-avatica-go"
   packages = [
     ".",
@@ -16,102 +19,146 @@
     "hsqldb",
     "internal",
     "message",
-    "phoenix"
+    "phoenix",
   ]
+  pruneopts = "UT"
   revision = "273c53f62206c90e6a4fbb05f4ac82b7f62cb9a7"
   version = "3.0.0"
 
 [[projects]]
+  digest = "1:adea5a94903eb4384abef30f3d878dc9ff6b6b5b0722da25b82e5169216dfb61"
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
+  pruneopts = "UT"
   revision = "d523deb1b23d913de5bdada721a6071e71283618"
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:2155aded3b7f51598751f556d9a524d92b35ad4aa4bb41f2d69a0f4ca76a5bfd"
+  name = "github.com/gobuffalo/packr"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "147bee9cde84aeca6693d1b1aedc595298f24d5b"
+  version = "v1.12.0"
+
+[[projects]]
+  digest = "1:15042ad3498153684d09f393bbaec6b216c8eec6d61f63dff711de7d64ed8861"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
+  pruneopts = "UT"
   revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
   version = "v1.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:354978aad16c56c27f57e5b152224806d87902e4935da3b03e18263d82ae77aa"
   name = "github.com/hashicorp/go-uuid"
   packages = ["."]
+  pruneopts = "UT"
   revision = "27454136f0364f2d44b1276c552d69105cf8c498"
 
 [[projects]]
   branch = "master"
+  digest = "1:a66133f6bf9cc0d41ec18977019db7d5500d4ffb291807e6f1d4274709d82d2e"
   name = "github.com/jcmturner/gofork"
   packages = [
     "encoding/asn1",
-    "x/crypto/pbkdf2"
+    "x/crypto/pbkdf2",
   ]
+  pruneopts = "UT"
   revision = "2aebee971930cd0dd525873330952ab7df5ac95c"
 
 [[projects]]
   branch = "master"
+  digest = "1:6866fc4160284073ee63525fc9e2cdef043a26892574340f71b4add734232853"
   name = "github.com/lib/pq"
   packages = [
     ".",
-    "oid"
+    "oid",
   ]
+  pruneopts = "UT"
   revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
 
 [[projects]]
+  digest = "1:3cafc6a5a1b8269605d9df4c6956d43d8011fc57f266ca6b9d04da6c09dee548"
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
+  pruneopts = "UT"
   revision = "25ecb14adfc7543176f7d85291ec7dba82c6f7e4"
   version = "v1.9.0"
 
 [[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
   branch = "master"
+  digest = "1:ff6b0586c0621a76832cf783eee58cbb9d9795d2ce8acbc199a4131db11c42a9"
   name = "github.com/satori/go.uuid"
   packages = ["."]
+  pruneopts = "UT"
   revision = "36e9d2ebbde5e3f13ab2e25625fd453271d6522e"
 
 [[projects]]
+  digest = "1:e5d7735120074eee9587d36d5f6452158563602461e7bf8a3b13883ce9f3a7c1"
   name = "github.com/xinsnake/go-http-digest-auth-client"
   packages = ["."]
+  pruneopts = "UT"
   revision = "366760120fe0342664d581b235be4eb08aca8834"
   version = "v0.3.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:dfa16802b07c70094db1e8804f8660581730ae15106449e688bc412ade5749ca"
   name = "golang.org/x/crypto"
   packages = [
     "md4",
-    "pbkdf2"
+    "pbkdf2",
   ]
+  pruneopts = "UT"
   revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
 
 [[projects]]
   branch = "master"
+  digest = "1:ce1f391e0e8c5e3c635dc2c712b037a2d0fd4241cc5648f23ca071565dd385f2"
   name = "golang.org/x/net"
   packages = [
     "context",
-    "context/ctxhttp"
+    "context/ctxhttp",
   ]
+  pruneopts = "UT"
   revision = "4cb1c02c05b0e749b0365f61ae859a8e0cfceed9"
 
 [[projects]]
+  digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
   name = "google.golang.org/appengine"
   packages = ["cloudsql"]
+  pruneopts = "UT"
   revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:c902038ee2d6f964d3b9f2c718126571410c5d81251cbab9fe58abd37803513c"
   name = "gopkg.in/jcmturner/aescts.v1"
   packages = ["."]
+  pruneopts = "UT"
   revision = "f6abebb3171c4c1b1fea279cb7c7325020a26290"
   version = "v1.0.1"
 
 [[projects]]
+  digest = "1:a1a3e185c03d79a7452d5d5b4c91be4cc433f55e6ed3a35233d852c966e39013"
   name = "gopkg.in/jcmturner/dnsutils.v1"
   packages = ["."]
+  pruneopts = "UT"
   revision = "13eeb8d49ffb74d7a75784c35e4d900607a3943c"
   version = "v1.0.1"
 
 [[projects]]
+  digest = "1:a1fe4c32d180d1ca51907c78f6790930dbf13ad1e64d961e7eabdb8e72897365"
   name = "gopkg.in/jcmturner/gokrb5.v4"
   packages = [
     "asn1tools",
@@ -144,14 +191,23 @@
     "mstypes",
     "ndr",
     "pac",
-    "types"
+    "types",
   ]
+  pruneopts = "UT"
   revision = "e1c433026ac06f967e528af826f87ae63be40807"
   version = "v4.1.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "712dfa58f60068f3b35e7ccbf3696f1e043bbbfa6bfd117d3b59113559dd2758"
+  input-imports = [
+    "github.com/DATA-DOG/go-sqlmock",
+    "github.com/apache/calcite-avatica-go",
+    "github.com/apache/calcite-avatica-go/errors",
+    "github.com/go-sql-driver/mysql",
+    "github.com/gobuffalo/packr",
+    "github.com/lib/pq",
+    "github.com/mattn/go-sqlite3",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
