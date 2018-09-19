@@ -8,7 +8,7 @@ import (
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	"github.com/apache/calcite-avatica-go"
+	"github.com/apache/calcite-avatica-go/v3"
 )
 
 type Driver struct {
