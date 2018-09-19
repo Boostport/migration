@@ -16,29 +16,32 @@ build:
     - setup-go-workspace
 
     - script:
+        name: install code climate
+        code: |
+          wget -O cc-test-reporter https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
+
+    - script:
         name: set up environment variables
         code: |
           export PHOENIX_HOST=http://$HBASE_PHOENIX_ALL_IN_ONE_PORT_8765_TCP_ADDR:8765
           export MYSQL_HOST=$MYSQL_PORT_3306_TCP_ADDR:3306
           export POSTGRES_HOST=$POSTGRES_PORT_5432_TCP_ADDR:5432
-    - script:
-        code: |
-          env
+
     - script:
       name: set up build tools
       code: |
         apk --no-cache --no-progress add build-base git
-    # Test the project
+
     - script:
         name: go test
         code: |
           export GO111MODULE=on
-          go test -cover -v ./...
-    # Invoke goveralls
+          go test -coverprofile c.out -v ./...
+          export GO_TEST_EXIT_CODE=$?
+
     - script:
-        name: goveralls
+        name: send results to code climate
         code: |
-          go get -u github.com/go-playground/overalls
-          go get -u github.com/mattn/goveralls
-          overalls -project="$WERCKER_GIT_DOMAIN/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY" -covermode=set -ignore=.git,vendor,message -debug
-          GIT_BRANCH=$WERCKER_GIT_BRANCH goveralls -coverprofile=overalls.coverprofile -service=wercker.com -repotoken $COVERALLS_TOKEN
+          ./cc-test-reporter after-build --exit-code $GO_TEST_EXIT_CODE
