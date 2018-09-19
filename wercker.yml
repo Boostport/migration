@@ -1,11 +1,11 @@
 box:
-  id: golang:1.10-alpine
+  id: golang:1.11-alpine
   cmd: /bin/sh
 
 no-response-timeout: 20
 
 services:
-  - boostport/hbase-phoenix-all-in-one:1.4-4.14
+  - boostport/hbase-phoenix-all-in-one:2.0-5.0
   - id: mysql:5
     env:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -14,6 +14,7 @@ build:
   steps:
 
     - setup-go-workspace
+
     - script:
         name: set up environment variables
         code: |
@@ -24,26 +25,15 @@ build:
         code: |
           env
     - script:
-      name: set up cgo build tools
+      name: set up build tools
       code: |
-        apk --no-cache --no-progress add build-base
-    - script:
-      name: get dependencies
-      code: |
-        apk update
-        apk add git
-        go get -u github.com/golang/dep/cmd/dep
-        dep ensure
-    # Build the project
-    - script:
-        name: go build
-        code: |
-          go build
+        apk --no-cache --no-progress add build-base git
     # Test the project
     - script:
         name: go test
         code: |
-          go test -cover -v $(go list ./... | grep -v /vendor/)
+          export GO111MODULE=on
+          go test -cover -v ./...
     # Invoke goveralls
     - script:
         name: goveralls
