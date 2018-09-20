@@ -12,9 +12,6 @@ services:
   - postgres:10-alpine
 build:
   steps:
-
-    - setup-go-workspace
-
     - script:
         name: install code climate
         code: |
@@ -37,11 +34,10 @@ build:
     - script:
         name: go test
         code: |
-          export GO111MODULE=on
           go test -coverprofile c.out -v ./...
           export GO_TEST_EXIT_CODE=$?
 
     - script:
         name: send results to code climate
         code: |
-          ./cc-test-reporter after-build --exit-code $GO_TEST_EXIT_CODE
+          ./cc-test-reporter after-build --prefix $WERCKER_GIT_DOMAIN/$WERCKER_GIT_OWNER/$WERCKER_GIT_REPOSITORY --exit-code $GO_TEST_EXIT_CODE
