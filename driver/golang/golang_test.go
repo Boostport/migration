@@ -1,7 +1,6 @@
 package golang
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/Boostport/migration"
@@ -13,102 +12,59 @@ func TestGolangDriver(t *testing.T) {
 
 	mockDBVersions := map[string]struct{}{}
 
-	config := NewConfig()
-	config.Set("test", "test")
-	config.Set("db", mockDB)
-	config.Set("versions", mockDBVersions)
-
-	if v := config.Get("test"); v != "test" {
-		t.Errorf("Expected test key in config to return %s, got %v", "test", v)
-	}
-
 	source := NewSource()
 
-	source.AddMigration("1_init", migration.Up, func(c *Config) error {
+	source.AddMigration("1_init", migration.Up, func() error {
 
-		db := c.Get("db")
-
-		if db == nil {
-			return errors.New("db is not in config map")
-		}
-
-		db.(map[string]string)["v1"] = "test"
+		mockDB["v1"] = "test"
 
 		return nil
 	})
 
-	source.AddMigration("1_init", migration.Down, func(c *Config) error {
+	source.AddMigration("1_init", migration.Down, func() error {
 
-		db := c.Get("db")
-
-		if db == nil {
-			return errors.New("db is not in config map")
-		}
-
-		delete(db.(map[string]string), "v1")
+		delete(mockDB, "v1")
 
 		return nil
 	})
 
-	source.AddMigration("2_update", migration.Up, func(c *Config) error {
+	source.AddMigration("2_update", migration.Up, func() error {
 
-		db := c.Get("db")
-
-		if db == nil {
-			return errors.New("db is not in config map")
-		}
-
-		db.(map[string]string)["v2"] = "test"
+		mockDB["v2"] = "test"
 
 		return nil
 	})
 
-	source.AddMigration("2_update", migration.Down, func(c *Config) error {
+	source.AddMigration("2_update", migration.Down, func() error {
 
-		db := c.Get("db")
-
-		if db == nil {
-			return errors.New("db is not in config map")
-		}
-
-		delete(db.(map[string]string), "v2")
+		delete(mockDB, "v2")
 
 		return nil
 	})
 
-	applied := func(c *Config) ([]string, error) {
-		versions := c.Get("versions")
-
-		if versions == nil {
-			return []string{}, errors.New("versions is not in config map")
-		}
+	applied := func() ([]string, error) {
 
 		var keys []string
 
-		for version := range versions.(map[string]struct{}) {
+		for version := range mockDBVersions {
 			keys = append(keys, version)
 		}
 
 		return keys, nil
 	}
 
-	updateVersion := func(id string, direction migration.Direction, c *Config) error {
-		versions := c.Get("versions")
-
-		if versions == nil {
-			return errors.New("versions is not in config map")
-		}
+	updateVersion := func(id string, direction migration.Direction) error {
 
 		if direction == migration.Up {
-			versions.(map[string]struct{})[id] = struct{}{}
+			mockDBVersions[id] = struct{}{}
 		} else if direction == migration.Down {
-			delete(versions.(map[string]struct{}), id)
+			delete(mockDBVersions, id)
 		}
 
 		return nil
 	}
 
-	driver, err := New(source, updateVersion, applied, config)
+	driver, err := New(source, updateVersion, applied)
 
 	if err != nil {
 		t.Errorf("Unexpected error while creating driver: %s", err)
