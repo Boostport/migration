@@ -144,49 +144,40 @@ transformations and then write it back. For these type of situations, you can us
 When using Go for migrations, create a `golang.Source` using `golang.NewSource()`. Then, simply add migrations to the source
 using the `AddMigration()` method. You will need to pass in the name of the migration without the extension and direction, e.g.
 `1_init`. For the second parameter, pass in the direction (`migration.Up` or `migration.Down`) and for the third parameter,
-pass in a function or method with this signature: `func(c *golangConfig) error` for running the migration.
-
-If your migrations need to access configuration values or database clients, create a `golang.Config` struct using
-`golang.NewConfig()`. This is concurrency-safe, and you can set values into it using `Set()` and retrieve values using `Get()`.
+pass in a function or method with this signature: `func() error` for running the migration.
 
 Finally, you need to define 2 functions:
-- A function for writing or deleting an applied migration matching this signature: `func(config *golang.Config, id string, direction migration.Direction) error`
-- A function for getting a list of applied migrations matching this signature: `func(config *golang.Config) ([]string, error)`
+- A function for writing or deleting an applied migration matching this signature: `func(id string, direction migration.Direction) error`
+- A function for getting a list of applied migrations matching this signature: `func() ([]string, error)`
 
 These are required for initializing the driver:
 ```go
-driver, err := golang.New(source, updateVersion, applied, config)
+driver, err := golang.New(source, updateVersion, applied)
 ```
 
 Here's a quick example:
 ```go
 source := golang.NewSource()
 
-source.AddMigration("1_init", migration.Up, func(c *golang.Config) error {
+source.AddMigration("1_init", migration.Up, func() error {
     // Run up migration here
-    
-    // If required, you can retrieve configuration here: something := c.Get("something")
 })
 
-source.AddMigration("1_init", migration.Down, func(c *golang.Config) error {
+source.AddMigration("1_init", migration.Down, func() error {
     // Run down migration here
 })
 
-// Create config
-config := golang.NewConfig()
-config.Set("test", "test")
-
 // Define functions
-applied := func(c *golang.Config) ([]string, error) {
+applied := func() ([]string, error) {
     // Return list of applied migrations
 }
 
-updateVersion := func(id string, direction migration.Direction, c *golangC.onfig) error {
+updateVersion := func(id string, direction migration.Direction) error {
     // Write or delete applied migration in storage
 }
 
 // Create driver
-driver, err := golang.New(source, updateVersion, applied, config)
+driver, err := golang.New(source, updateVersion, applied)
 
 // Run migrations
 count, err = migration.Migrate(driver, source, migration.Up, 0)

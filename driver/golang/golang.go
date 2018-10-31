@@ -9,51 +9,22 @@ import (
 	m "github.com/Boostport/migration"
 )
 
-type Config struct {
-	sync.Mutex
-	config map[interface{}]interface{}
-}
-
-// NewGolangConfig creates a concurrency-safe configuration map for passing configuration data and things like
-// database handlers to your migrations.
-func NewConfig() *Config {
-	return &Config{
-		config: map[interface{}]interface{}{},
-	}
-}
-
-// Set adds a new key-value pair to the configuration.
-func (c *Config) Set(key, val interface{}) {
-	c.Lock()
-	defer c.Unlock()
-
-	c.config[key] = val
-}
-
-// Get retrieves a value from the configuration using the key.
-func (c *Config) Get(key interface{}) interface{} {
-	c.Lock()
-	defer c.Unlock()
-
-	return c.config[key]
-}
-
 type Source struct {
 	sync.Mutex
-	migrations map[string]func(c *Config) error
+	migrations map[string]func() error
 }
 
 // NewGolangSource creates a source for storing Go functions as migrations.
 func NewSource() *Source {
 	return &Source{
-		migrations: map[string]func(c *Config) error{},
+		migrations: map[string]func() error{},
 	}
 }
 
 // AddMigration adds a new migration to the source. The file parameter follows the same conventions as you would use
 // for a physical file for other types of migrations, however you should omit the file extension. Example: 1_init.up
 // and 1_init.down
-func (s *Source) AddMigration(file string, direction m.Direction, migration func(c *Config) error) {
+func (s *Source) AddMigration(file string, direction m.Direction, migration func() error) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -66,7 +37,7 @@ func (s *Source) AddMigration(file string, direction m.Direction, migration func
 	s.migrations[file+".go"] = migration
 }
 
-func (s *Source) getMigration(file string) func(c *Config) error {
+func (s *Source) getMigration(file string) func() error {
 	s.Lock()
 	defer s.Unlock()
 
@@ -96,7 +67,7 @@ func (s *Source) GetMigrationFile(file string) (io.Reader, error) {
 	_, ok := s.migrations[file]
 
 	if !ok {
-		return nil, fmt.Errorf("Migration %s does not exist", file)
+		return nil, fmt.Errorf("migration %s does not exist", file)
 	}
 
 	return strings.NewReader(""), nil
@@ -104,21 +75,19 @@ func (s *Source) GetMigrationFile(file string) (io.Reader, error) {
 
 type Driver struct {
 	source        *Source
-	config        *Config
 	updateVersion UpdateVersion
 	applied       AppliedVersions
 }
 
-type UpdateVersion func(id string, direction m.Direction, config *Config) error
+type UpdateVersion func(id string, direction m.Direction) error
 
-type AppliedVersions func(config *Config) ([]string, error)
+type AppliedVersions func() ([]string, error)
 
 // NewGolang creates a new Go migration driver. It requires a source a function for saving the executed migration version, a function for deleting a version
 // that was migrated downwards, a function for listing all applied migrations and optionally a configuration.
-func New(source *Source, updateVersion UpdateVersion, applied AppliedVersions, config *Config) (m.Driver, error) {
+func New(source *Source, updateVersion UpdateVersion, applied AppliedVersions) (m.Driver, error) {
 	return &Driver{
 		source:        source,
-		config:        config,
 		updateVersion: updateVersion,
 		applied:       applied,
 	}, nil
@@ -140,16 +109,16 @@ func (g *Driver) Migrate(migration *m.PlannedMigration) error {
 
 	migrationFunc := g.source.getMigration(file)
 
-	err := migrationFunc(g.config)
+	err := migrationFunc()
 
 	if err != nil {
-		return fmt.Errorf("Error executing golang migration: %s", err)
+		return fmt.Errorf("error executing golang migration: %s", err)
 	}
 
-	err = g.updateVersion(migration.ID, migration.Direction, g.config)
+	err = g.updateVersion(migration.ID, migration.Direction)
 
 	if err != nil {
-		return fmt.Errorf("Error executing golang update function: %s", err)
+		return fmt.Errorf("error executing golang update function: %s", err)
 	}
 
 	return nil
@@ -157,5 +126,5 @@ func (g *Driver) Migrate(migration *m.PlannedMigration) error {
 
 // Version returns all applied migration versions
 func (g *Driver) Versions() ([]string, error) {
-	return g.applied(g.config)
+	return g.applied()
 }
