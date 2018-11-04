@@ -42,11 +42,11 @@ func (a GoBindataMigrationSource) GetMigrationFile(name string) (io.Reader, erro
 	return bytes.NewReader(file), nil
 }
 
-// Avoids pulling in the packr library for everyone, mimicks the bits of
+// Avoids pulling in the packr library for everyone, mimics the bits of
 // packr.Box that we need.
 type PackrBox interface {
 	List() []string
-	Bytes(name string) []byte
+	Find(name string) ([]byte, error)
 }
 
 type PackrMigrationSource struct {
@@ -89,9 +89,9 @@ func (p PackrMigrationSource)ListMigrationFiles() ([]string, error) {
 }
 
 func (p PackrMigrationSource)GetMigrationFile(name string) (io.Reader, error) {
-	file := p.Box.Bytes(path.Join(p.Dir, name))
+	file, err := p.Box.Find(path.Join(p.Dir, name))
 
-	return bytes.NewReader(file), nil
+	return bytes.NewReader(file), err
 }
 
 // MemoryMigrationSource is a MigrationSource that uses migration sources in memory. It is mainly
