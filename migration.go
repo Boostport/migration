@@ -1,23 +1,29 @@
 package migration
 
 import (
-"bytes"
-"fmt"
-"io/ioutil"
-"regexp"
-"sort"
-"strconv"
+	"bytes"
+	"fmt"
+	"io/ioutil"
+	"regexp"
+	"sort"
+	"strconv"
 
-
-
-
-
-
-
-"github.com/Boostport/migration/parser"
+	"github.com/Boostport/migration/parser"
 )
 
 type Direction int
+
+// String returns a string representation of the direction
+func (d Direction) String() string {
+	switch d {
+	case Up:
+		return "up"
+	case Down:
+		return "down"
+	default:
+		return "directionless"
+	}
+}
 
 const (
 	Up Direction = iota
@@ -100,6 +106,7 @@ func Migrate(driver Driver, migrations Source, direction Direction, max int) (in
 	migrationsToApply := planMigrations(m, appliedMigrations, direction, max)
 
 	for _, plannedMigration := range migrationsToApply {
+		logPrintf("Applying migration (%s) named '%s'...", direction.String(), plannedMigration.ID)
 
 		err = driver.Migrate(plannedMigration)
 		if err != nil {
@@ -115,6 +122,7 @@ func Migrate(driver Driver, migrations Source, direction Direction, max int) (in
 			return count, fmt.Errorf(errorMessage+": %s", err)
 		}
 
+		logPrintf("Applied migration (%s) named '%s'", direction.String(), plannedMigration.ID)
 		count++
 	}
 
