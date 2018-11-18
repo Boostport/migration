@@ -11,6 +11,19 @@ import (
 	"github.com/gobuffalo/packr"
 )
 
+func TestDirectionString(t *testing.T) {
+	if Up.String() != "up" {
+		t.Errorf("Expect `Up` to be 'up', got '%s'", Up.String())
+	}
+	if Down.String() != "down" {
+		t.Errorf("Expect `Down` to be 'down', got '%s'", Down.String())
+	}
+	var Other Direction = -1
+	if Other.String() != "directionless" {
+		t.Errorf("Expect `Other` to be 'directionless', got '%s'", Other.String())
+	}
+}
+
 type mockDriver struct {
 	applied []string
 }
@@ -202,7 +215,7 @@ func TestPackrMigrationSource(t *testing.T) {
 
 	assetMigration := &PackrMigrationSource{
 		Box: packr.NewBox("."),
-		Dir:      "test-migrations",
+		Dir: "test-migrations",
 	}
 
 	driver := getMockDriver()
