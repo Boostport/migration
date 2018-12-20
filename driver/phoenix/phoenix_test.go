@@ -7,12 +7,11 @@ import (
 
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	"github.com/DATA-DOG/go-sqlmock"
+	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/apache/calcite-avatica-go/v3/errors"
 )
 
 func TestPhoenixDriver(t *testing.T) {
-
 	phoenixHost := os.Getenv("PHOENIX_HOST")
 
 	// prepare clean database
@@ -22,7 +21,12 @@ func TestPhoenixDriver(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer connection.Close()
+	defer func() {
+		err := connection.Close()
+		if err != nil {
+			t.Errorf("unexpected error while closing the phoenix connection: %v", err)
+		}
+	}()
 
 	schema := "migrationtest"
 
@@ -38,13 +42,30 @@ func TestPhoenixDriver(t *testing.T) {
 		t.Errorf("Unable to open connection to phoenix server: %s", err)
 	}
 
-	defer driver.Close()
+	defer func() {
+		err := driver.Close()
+		if err != nil {
+			t.Errorf("unexpected error while closing the phoenix driver: %v", err)
+		}
+	}()
 
 	defer func() {
-		connection.Exec("DROP TABLE IF EXISTS test_table1")
-		connection.Exec("DROP TABLE IF EXISTS test_table2")
-		connection.Exec("DROP TABLE IF EXISTS schema_migration")
-		connection.Exec("DROP SCHEMA IF EXISTS " + schema)
+		_, err := connection.Exec("DROP TABLE IF EXISTS test_table1")
+		if err != nil {
+			t.Errorf("unexpected error while dropping the phoenix table: %v", err)
+		}
+		_, err = connection.Exec("DROP TABLE IF EXISTS test_table2")
+		if err != nil {
+			t.Errorf("unexpected error while dropping the phoenix table: %v", err)
+		}
+		_, err = connection.Exec("DROP TABLE IF EXISTS schema_migration")
+		if err != nil {
+			t.Errorf("unexpected error while dropping the phoenix table: %v", err)
+		}
+		_, err = connection.Exec("DROP SCHEMA IF EXISTS " + schema)
+		if err != nil {
+			t.Errorf("unexpected error while dropping the phoenix schema %s: %v", schema, err)
+		}
 	}()
 
 	migrations := []*migration.PlannedMigration{
@@ -186,32 +207,45 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer connection.Close()
+	defer func() {
+		err := connection.Close()
+		if err != nil {
+			t.Errorf("unexpected error while closing the phoenix connection: %v", err)
+		}
+	}()
 
 	schema := "migrationtest"
 
 	_, err = connection.Exec("CREATE SCHEMA IF NOT EXISTS " + schema)
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	defer func() {
-		connection.Exec("DROP TABLE IF EXISTS schema_migration")
-		connection.Exec("DROP SCHEMA IF EXISTS " + schema)
+		_, err := connection.Exec("DROP TABLE IF EXISTS schema_migration")
+		if err != nil {
+			t.Errorf("unexpected error while dropping the phoenix table: %v", err)
+		}
+		_, err = connection.Exec("DROP SCHEMA IF EXISTS " + schema)
+		if err != nil {
+			t.Errorf("unexpected error while dropping the phoenix schema %s: %v", schema, err)
+		}
 	}()
 
 	db, err := sql.Open("avatica", phoenixHost+"/")
-
 	if err != nil {
 		t.Fatalf("Could not open avatica connection: %s", err)
 	}
 
 	driver, err := NewFromDB(db)
-
 	if err != nil {
 		t.Errorf("Unable to create Avatica driver: %s", err)
 	}
 
-	defer driver.Close()
+	defer func() {
+		err := driver.Close()
+		if err != nil {
+			t.Errorf("unexpected error while closing the phoenix driver: %v", err)
+		}
+	}()
 }

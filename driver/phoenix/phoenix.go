@@ -8,9 +8,10 @@ import (
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	"github.com/apache/calcite-avatica-go/v3"
+	avatica "github.com/apache/calcite-avatica-go/v3"
 )
 
+// Driver is the phoenix migration.Driver implementation
 type Driver struct {
 	db *sql.DB
 }
@@ -20,7 +21,6 @@ const phoenixTableName = "schema_migration"
 // New creates a new Apache Avatica Driver.
 // The DSN is documented here: https://calcite.apache.org/avatica/docs/go_client_reference.html#dsn-data-source-name
 func New(dsn string) (m.Driver, error) {
-
 	db, err := sql.Open("avatica", dsn)
 
 	if err != nil {
@@ -42,8 +42,8 @@ func New(dsn string) (m.Driver, error) {
 	return p, nil
 }
 
+// NewFromDB returns a phoenix driver from a sql.DB
 func NewFromDB(db *sql.DB) (m.Driver, error) {
-
 	if _, ok := db.Driver().(*avatica.Driver); !ok {
 		return nil, errors.New("database instance is not using the avatica driver")
 	}
@@ -76,22 +76,17 @@ func (driver *Driver) ensureVersionTableExists() error {
 
 // Migrate runs a migration.
 func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
-
 	// TODO: Driver does not support DDL statements in a transaction yet :( See PHOENIX-3358
 
 	var migrationStatements *parser.ParsedMigration
 
 	if migration.Direction == m.Up {
-
 		migrationStatements = migration.Up
-
 	} else if migration.Direction == m.Down {
-
 		migrationStatements = migration.Down
 	}
 
 	for _, sqlStmt := range migrationStatements.Statements {
-
 		// Special case for Phoenix. We force a statement split here, because Phoenix SQL statements must not be terminated with ;.
 		// In addition, this explicitly splits the SQL statements into its constituent statements.
 		splitted := strings.Split(sqlStmt, ";")
@@ -130,7 +125,9 @@ func (driver *Driver) Versions() ([]string, error) {
 		return versions, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	for rows.Next() {
 		var version string

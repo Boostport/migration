@@ -11,6 +11,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+// Driver is the mysql migration.Driver implementation
 type Driver struct {
 	db *sql.DB
 }
@@ -50,8 +51,8 @@ func New(dsn string) (m.Driver, error) {
 	return d, nil
 }
 
+// NewFromDB returns a mysql driver from a sql.DB
 func NewFromDB(db *sql.DB) (m.Driver, error) {
-
 	if _, ok := db.Driver().(*mysql.MySQLDriver); !ok {
 		return nil, errors.New("database instance is not using the MySQL driver")
 	}
@@ -132,7 +133,9 @@ func (driver *Driver) Versions() ([]string, error) {
 		return versions, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	for rows.Next() {
 		var version string

@@ -33,7 +33,6 @@ func (m *mockDriver) Close() error {
 }
 
 func (m *mockDriver) Migrate(migration *PlannedMigration) error {
-
 	var migrationStatements *parser.ParsedMigration
 
 	if migration.Direction == Up {
@@ -49,7 +48,7 @@ func (m *mockDriver) Migrate(migration *PlannedMigration) error {
 	}
 
 	if strings.Contains(errStatement, "error") {
-		return errors.New("Error executing migration.")
+		return errors.New("error executing migration")
 	}
 
 	versionIndex := -1

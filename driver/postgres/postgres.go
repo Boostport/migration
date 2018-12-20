@@ -10,16 +10,16 @@ import (
 	"github.com/lib/pq"
 )
 
+// Driver is the postgres migration.Driver implementation
 type Driver struct {
 	db *sql.DB
 }
 
 const postgresTableName = "schema_migration"
 
-// NewPostgres creates a new Driver driver.
+// New creates a new Driver driver.
 // The DSN is documented here: https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
 func New(dsn string) (m.Driver, error) {
-
 	db, err := sql.Open("postgres", dsn)
 
 	if err != nil {
@@ -41,8 +41,8 @@ func New(dsn string) (m.Driver, error) {
 	return d, nil
 }
 
+// NewFromDB returns a postgres driver from a sql.DB
 func NewFromDB(db *sql.DB) (m.Driver, error) {
-
 	if _, ok := db.Driver().(*pq.Driver); !ok {
 		return nil, errors.New("database instance is not using the postgres driver")
 	}
@@ -103,7 +103,7 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 		defer func() {
 			if err != nil {
 				if errRb := tx.Rollback(); errRb != nil {
-					err = fmt.Errorf("Error rolling back: %s\n%s", errRb, err)
+					err = fmt.Errorf("error rolling back: %s\n%s", errRb, err)
 				}
 				return
 			}
@@ -112,24 +112,24 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 		for _, statement := range migrationStatements.Statements {
 			if _, err = tx.Exec(statement); err != nil {
-				return fmt.Errorf("Error executing statement: %s\n%s", err, statement)
+				return fmt.Errorf("error executing statement: %s\n%s", err, statement)
 			}
 		}
 
 		if _, err = tx.Exec(insertVersion, migration.ID); err != nil {
-			return fmt.Errorf("Error updating migration versions: %s", err)
+			return fmt.Errorf("error updating migration versions: %s", err)
 		}
 
 	} else {
 
 		for _, statement := range migrationStatements.Statements {
 			if _, err := driver.db.Exec(statement); err != nil {
-				return fmt.Errorf("Error executing statement: %s\n%s", err, statement)
+				return fmt.Errorf("error executing statement: %s\n%s", err, statement)
 			}
 		}
 
 		if _, err = driver.db.Exec(insertVersion, migration.ID); err != nil {
-			return fmt.Errorf("Error updating migration versions: %s", err)
+			return fmt.Errorf("error updating migration versions: %s", err)
 		}
 	}
 
@@ -146,7 +146,9 @@ func (driver *Driver) Versions() ([]string, error) {
 		return versions, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	for rows.Next() {
 		var version string

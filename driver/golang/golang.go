@@ -9,12 +9,13 @@ import (
 	m "github.com/Boostport/migration"
 )
 
+// Source implements migration.Source
 type Source struct {
 	sync.Mutex
 	migrations map[string]func() error
 }
 
-// NewGolangSource creates a source for storing Go functions as migrations.
+// NewSource creates a source for storing Go functions as migrations.
 func NewSource() *Source {
 	return &Source{
 		migrations: map[string]func() error{},
@@ -73,17 +74,20 @@ func (s *Source) GetMigrationFile(file string) (io.Reader, error) {
 	return strings.NewReader(""), nil
 }
 
+// Driver is the golang migration.Driver implementation
 type Driver struct {
 	source        *Source
 	updateVersion UpdateVersion
 	applied       AppliedVersions
 }
 
+// UpdateVersion takes an id and a direction and returns an error if something fails
 type UpdateVersion func(id string, direction m.Direction) error
 
+// AppliedVersions returns a list of applied versions and an error if something fails
 type AppliedVersions func() ([]string, error)
 
-// NewGolang creates a new Go migration driver. It requires a source a function for saving the executed migration version, a function for deleting a version
+// New creates a new Go migration driver. It requires a source a function for saving the executed migration version, a function for deleting a version
 // that was migrated downwards, a function for listing all applied migrations and optionally a configuration.
 func New(source *Source, updateVersion UpdateVersion, applied AppliedVersions) (m.Driver, error) {
 	return &Driver{
@@ -93,12 +97,13 @@ func New(source *Source, updateVersion UpdateVersion, applied AppliedVersions) (
 	}, nil
 }
 
+// Close is the migration.Driver implementation of io.Closer
 func (g *Driver) Close() error {
 	return nil
 }
 
+// Migrate executes a planned migration
 func (g *Driver) Migrate(migration *m.PlannedMigration) error {
-
 	file := migration.ID
 
 	if migration.Direction == m.Up {
@@ -124,7 +129,7 @@ func (g *Driver) Migrate(migration *m.PlannedMigration) error {
 	return nil
 }
 
-// Version returns all applied migration versions
+// Versions returns all applied migration versions
 func (g *Driver) Versions() ([]string, error) {
 	return g.applied()
 }

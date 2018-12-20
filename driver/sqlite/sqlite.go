@@ -7,9 +7,10 @@ import (
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	"github.com/mattn/go-sqlite3"
+	sqlite3 "github.com/mattn/go-sqlite3"
 )
 
+// Driver is the sqlite migration.Driver implementation
 type Driver struct {
 	db              *sql.DB
 	useTransactions bool
@@ -17,7 +18,7 @@ type Driver struct {
 
 const sqliteTableName = "schema_migration"
 
-// NewSQLite creates a new Driver driver.
+// New creates a new Driver driver.
 // The DSN is documented here: https://godoc.org/github.com/mattn/go-sqlite3#SQLiteDriver.Open
 func New(dsn string, useTransactions bool) (m.Driver, error) {
 
@@ -43,8 +44,8 @@ func New(dsn string, useTransactions bool) (m.Driver, error) {
 	return d, nil
 }
 
+// NewFromDB returns a sqlite driver from a sql.db
 func NewFromDB(db *sql.DB) (m.Driver, error) {
-
 	if _, ok := db.Driver().(*sqlite3.SQLiteDriver); !ok {
 		return nil, errors.New("database instance is not using the postgres driver")
 	}
@@ -104,7 +105,7 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 		defer func() {
 			if err != nil {
 				if errRb := tx.Rollback(); errRb != nil {
-					err = fmt.Errorf("Error rolling back: %s\n%s", errRb, err)
+					err = fmt.Errorf("error rolling back: %s\n%s", errRb, err)
 				}
 				return
 			}
@@ -115,25 +116,25 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 
 			if _, err = tx.Exec(statement); err != nil {
 
-				return fmt.Errorf("Error executing statement: %s\n%s", err, statement)
+				return fmt.Errorf("error executing statement: %s\n%s", err, statement)
 			}
 		}
 
 		if _, err = tx.Exec(insertVersion, migration.ID); err != nil {
 
-			return fmt.Errorf("Error updating migration versions: %s", err)
+			return fmt.Errorf("error updating migration versions: %s", err)
 		}
 	} else {
 
 		for _, statement := range migrationStatements.Statements {
 			if _, err := driver.db.Exec(statement); err != nil {
-				return fmt.Errorf("Error executing statement: %s\n%s", err, statement)
+				return fmt.Errorf("error executing statement: %s\n%s", err, statement)
 			}
 		}
 
 		if _, err = driver.db.Exec(insertVersion, migration.ID); err != nil {
 
-			return fmt.Errorf("Error updating migration versions: %s", err)
+			return fmt.Errorf("error updating migration versions: %s", err)
 		}
 	}
 
@@ -150,7 +151,9 @@ func (driver *Driver) Versions() ([]string, error) {
 		return versions, err
 	}
 
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	for rows.Next() {
 		var version string

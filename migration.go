@@ -11,6 +11,7 @@ import (
 	"github.com/Boostport/migration/parser"
 )
 
+// Direction type up/down
 type Direction int
 
 // String returns a string representation of the direction
@@ -25,6 +26,7 @@ func (d Direction) String() string {
 	}
 }
 
+// Constants for direction
 const (
 	Up Direction = iota
 	Down
@@ -64,6 +66,7 @@ func (m Migration) isNumeric() bool {
 	return len(m.NumberPrefixMatches()) > 0
 }
 
+// NumberPrefixMatches returns a list of string matches
 func (m Migration) NumberPrefixMatches() []string {
 	return numberPrefixRegex.FindStringSubmatch(m.ID)
 }

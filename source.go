@@ -26,13 +26,13 @@ type GoBindataMigrationSource struct {
 	Dir string
 }
 
+// ListMigrationFiles returns a list of gobindata migration files
 func (a GoBindataMigrationSource) ListMigrationFiles() ([]string, error) {
-
 	return a.AssetDir(a.Dir)
 }
 
+// GetMigrationFile gets a gobindata migration file
 func (a GoBindataMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
-
 	file, err := a.Asset(path.Join(a.Dir, name))
 
 	if err != nil {
@@ -42,13 +42,14 @@ func (a GoBindataMigrationSource) GetMigrationFile(name string) (io.Reader, erro
 	return bytes.NewReader(file), nil
 }
 
-// Avoids pulling in the packr library for everyone, mimics the bits of
+// PackrBox avoids pulling in the packr library for everyone, mimics the bits of
 // packr.Box that we need.
 type PackrBox interface {
 	List() []string
 	Find(name string) ([]byte, error)
 }
 
+// PackrMigrationSource holds the box and dir info
 type PackrMigrationSource struct {
 	Box PackrBox
 
@@ -56,8 +57,8 @@ type PackrMigrationSource struct {
 	Dir string
 }
 
-func (p PackrMigrationSource)ListMigrationFiles() ([]string, error) {
-
+// ListMigrationFiles returns a list of packr migration files
+func (p PackrMigrationSource) ListMigrationFiles() ([]string, error) {
 	files := p.Box.List()
 
 	var migrations []string
@@ -70,7 +71,7 @@ func (p PackrMigrationSource)ListMigrationFiles() ([]string, error) {
 		prefix = fmt.Sprintf("%s/", dir)
 	}
 
-	for _, file := range files{
+	for _, file := range files {
 
 		if !strings.HasPrefix(file, prefix) {
 			continue
@@ -88,7 +89,8 @@ func (p PackrMigrationSource)ListMigrationFiles() ([]string, error) {
 	return migrations, nil
 }
 
-func (p PackrMigrationSource)GetMigrationFile(name string) (io.Reader, error) {
+// GetMigrationFile gets a packr migration file
+func (p PackrMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
 	file, err := p.Box.Find(path.Join(p.Dir, name))
 
 	return bytes.NewReader(file), err
@@ -100,8 +102,8 @@ type MemoryMigrationSource struct {
 	Files map[string]string
 }
 
+// ListMigrationFiles returns a list of memory migration files
 func (m MemoryMigrationSource) ListMigrationFiles() ([]string, error) {
-
 	var files []string
 
 	for file := range m.Files {
@@ -111,12 +113,12 @@ func (m MemoryMigrationSource) ListMigrationFiles() ([]string, error) {
 	return files, nil
 }
 
+// GetMigrationFile gets a memory migration file
 func (m MemoryMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
-
 	content, ok := m.Files[name]
 
 	if !ok {
-		return nil, fmt.Errorf("The migration file %s does not exist.", name)
+		return nil, fmt.Errorf("the migration file %s does not exist", name)
 	}
 
 	return strings.NewReader(content), nil

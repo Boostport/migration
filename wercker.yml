@@ -1,6 +1,8 @@
 box:
   id: golang:1.11-alpine
   cmd: /bin/sh
+  env:
+    GO111MODULE: on
 
 no-response-timeout: 20
 
@@ -29,7 +31,17 @@ build:
     - script:
       name: set up build tools
       code: |
-        apk --no-cache --no-progress add build-base git
+        apk --no-cache --no-progress add build-base git make
+
+    - script:
+        name: install golangci-lint
+        code: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint
+
+    - script:
+        name: make sanity-check
+        code: |
+          make sanity-check
 
     - script:
         name: go test
