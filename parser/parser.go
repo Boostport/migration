@@ -16,20 +16,19 @@ const (
 	optionEndStatement   = "EndStatement"
 )
 
+// ParsedMigration is a parsed migration
 type ParsedMigration struct {
 	UseTransaction bool
 	Statements     []string
 }
 
 func splitStatementsBySemicolon(buf string) []string {
-
 	statements := strings.SplitAfter(buf, ";")
 
 	for i, statement := range statements {
 		trimmed := strings.TrimSpace(statement)
-
 		if trimmed == "" && i > 0 {
-			statements[i-1] = statements[i-1] + statements[i]
+			statements[i-1] += statements[i]
 			statements = statements[:i+copy(statements[i:], statements[i+1:])]
 		}
 	}
@@ -37,8 +36,8 @@ func splitStatementsBySemicolon(buf string) []string {
 	return statements
 }
 
+// Parse reads a migration and returns a parsed migrations
 func Parse(r io.Reader) (*ParsedMigration, error) {
-
 	p := &ParsedMigration{
 		UseTransaction: true,
 		Statements:     []string{},
@@ -87,11 +86,8 @@ func Parse(r io.Reader) (*ParsedMigration, error) {
 
 				buf.Reset()
 			}
-		} else {
-
-			if _, err := buf.WriteString(line); err != nil {
-				return p, errors.New("error writing line to buffer")
-			}
+		} else if _, err := buf.WriteString(line); err != nil {
+			return p, errors.New("error writing line to buffer")
 		}
 
 		isFirstLine = false
