@@ -21,21 +21,16 @@ const mysqlTableName = "schema_migration"
 // New creates a new Driver driver.
 // The DSN is documented here: https://github.com/go-sql-driver/mysql#dsn-data-source-name
 func New(dsn string) (m.Driver, error) {
-
 	parsedDSN, err := mysql.ParseDSN(dsn)
-
 	if err != nil {
 		return nil, err
 	}
 
 	parsedDSN.MultiStatements = true
-
 	db, err := sql.Open("mysql", parsedDSN.FormatDSN())
-
 	if err != nil {
 		return nil, err
 	}
-
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
@@ -43,11 +38,9 @@ func New(dsn string) (m.Driver, error) {
 	d := &Driver{
 		db: db,
 	}
-
 	if err := d.ensureVersionTableExists(); err != nil {
 		return nil, err
 	}
-
 	return d, nil
 }
 
@@ -64,11 +57,9 @@ func NewFromDB(db *sql.DB) (m.Driver, error) {
 	d := &Driver{
 		db: db,
 	}
-
 	if err := d.ensureVersionTableExists(); err != nil {
 		return nil, err
 	}
-
 	return d, nil
 }
 
@@ -85,25 +76,19 @@ func (driver *Driver) ensureVersionTableExists() error {
 
 // Migrate runs a migration.
 func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
-
 	// Note: Driver does not support DDL statements in a transaction. If DDL statements are
 	// executed in a transaction, it is an implicit commit.
 	// See: http://dev.mysql.com/doc/refman/5.7/en/implicit-commit.html
 	var migrationStatements *parser.ParsedMigration
 
 	if migration.Direction == m.Up {
-
 		migrationStatements = migration.Up
-
 	} else if migration.Direction == m.Down {
-
 		migrationStatements = migration.Down
 	}
 
 	for _, sqlStmt := range migrationStatements.Statements {
-
 		if len(strings.TrimSpace(sqlStmt)) > 0 {
-
 			if _, err := driver.db.Exec(sqlStmt); err != nil {
 				return fmt.Errorf("Error executing statement: %s\n%s", err, sqlStmt)
 			}
@@ -128,7 +113,6 @@ func (driver *Driver) Versions() ([]string, error) {
 	var versions []string
 
 	rows, err := driver.db.Query("SELECT version FROM " + mysqlTableName + " ORDER BY version DESC")
-
 	if err != nil {
 		return versions, err
 	}
@@ -139,13 +123,10 @@ func (driver *Driver) Versions() ([]string, error) {
 
 	for rows.Next() {
 		var version string
-
 		err = rows.Scan(&version)
-
 		if err != nil {
 			return versions, err
 		}
-
 		versions = append(versions, version)
 	}
 

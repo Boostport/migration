@@ -51,7 +51,6 @@ func Parse(r io.Reader) (*ParsedMigration, error) {
 	isFirstLine := true
 
 	for scanner.Scan() {
-
 		line := scanner.Text()
 		trimmed := strings.TrimSpace(line)
 
@@ -63,11 +62,9 @@ func Parse(r io.Reader) (*ParsedMigration, error) {
 				if !isFirstLine && buf.Len() > 0 {
 					return p, fmt.Errorf("%s%s must be in the first line of the migration", sqlCmdPrefix, optionNoTransaction)
 				}
-
 				p.UseTransaction = false
 
 			case optionBeginStatement:
-
 				// Add lines encountered before beginning the statement
 				withoutCR := string(dropCR(buf.Bytes()))
 
@@ -76,11 +73,9 @@ func Parse(r io.Reader) (*ParsedMigration, error) {
 				} else {
 					p.Statements = append(p.Statements, withoutCR)
 				}
-
 				buf.Reset()
 
 			case optionEndStatement:
-
 				// Add the lines encountered during a statement block as 1 block
 				p.Statements = append(p.Statements, string(dropCR(buf.Bytes())))
 
@@ -95,7 +90,6 @@ func Parse(r io.Reader) (*ParsedMigration, error) {
 
 	// If the buffer contains lines, process them
 	if buf.Len() > 0 && strings.TrimSpace(buf.String()) != "" {
-
 		withoutCR := string(dropCR(buf.Bytes()))
 
 		if !p.UseTransaction {

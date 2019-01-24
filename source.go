@@ -6,6 +6,7 @@ import (
 	"io"
 	"path"
 	"strings"
+	"sync"
 )
 
 // Source is an interface that defines how a source can find and read migration files.
@@ -34,7 +35,6 @@ func (a GoBindataMigrationSource) ListMigrationFiles() ([]string, error) {
 // GetMigrationFile gets a gobindata migration file
 func (a GoBindataMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
 	file, err := a.Asset(path.Join(a.Dir, name))
-
 	if err != nil {
 		return nil, err
 	}
@@ -60,25 +60,19 @@ type PackrMigrationSource struct {
 // ListMigrationFiles returns a list of packr migration files
 func (p PackrMigrationSource) ListMigrationFiles() ([]string, error) {
 	files := p.Box.List()
-
 	var migrations []string
-
 	prefix := ""
 
 	dir := path.Clean(p.Dir)
-
 	if dir != "." {
 		prefix = fmt.Sprintf("%s/", dir)
 	}
 
 	for _, file := range files {
-
 		if !strings.HasPrefix(file, prefix) {
 			continue
 		}
-
 		name := strings.TrimPrefix(file, prefix)
-
 		if strings.Contains(name, "/") {
 			continue
 		}
@@ -94,6 +88,70 @@ func (p PackrMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
 	file, err := p.Box.Find(path.Join(p.Dir, name))
 
 	return bytes.NewReader(file), err
+}
+
+// GolangMigrationSource implements migration.Source
+type GolangMigrationSource struct {
+	sync.Mutex
+	migrations map[string]func() error
+}
+
+// NewGolangMigrationSource creates a source for storing Go functions as migrations.
+func NewGolangMigrationSource() *GolangMigrationSource {
+	return &GolangMigrationSource{
+		migrations: map[string]func() error{},
+	}
+}
+
+// AddMigration adds a new migration to the source. The file parameter follows the same conventions as you would use
+// for a physical file for other types of migrations, however you should omit the file extension. Example: 1_init.up
+// and 1_init.down
+func (s *GolangMigrationSource) AddMigration(file string, direction Direction, migration func() error) {
+	s.Lock()
+	defer s.Unlock()
+
+	if direction == Up {
+		file += ".up"
+	} else if direction == Down {
+		file += ".down"
+	}
+
+	s.migrations[file+".go"] = migration
+}
+
+// GetMigration gets a golang migration
+func (s *GolangMigrationSource) GetMigration(file string) func() error {
+	s.Lock()
+	defer s.Unlock()
+
+	return s.migrations[file+".go"]
+}
+
+// ListMigrationFiles lists the available migrations in the source
+func (s *GolangMigrationSource) ListMigrationFiles() ([]string, error) {
+	var keys []string
+
+	s.Lock()
+	defer s.Unlock()
+
+	for key := range s.migrations {
+		keys = append(keys, key)
+	}
+
+	return keys, nil
+}
+
+// GetMigrationFile retrieves a migration given the filename.
+func (s *GolangMigrationSource) GetMigrationFile(file string) (io.Reader, error) {
+	s.Lock()
+	defer s.Unlock()
+
+	_, ok := s.migrations[file]
+	if !ok {
+		return nil, fmt.Errorf("migration %s does not exist", file)
+	}
+
+	return strings.NewReader(""), nil
 }
 
 // MemoryMigrationSource is a MigrationSource that uses migration sources in memory. It is mainly
@@ -116,7 +174,6 @@ func (m MemoryMigrationSource) ListMigrationFiles() ([]string, error) {
 // GetMigrationFile gets a memory migration file
 func (m MemoryMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
 	content, ok := m.Files[name]
-
 	if !ok {
 		return nil, fmt.Errorf("the migration file %s does not exist", name)
 	}

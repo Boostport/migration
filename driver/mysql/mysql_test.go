@@ -13,16 +13,13 @@ import (
 
 func TestMySQLDriver(t *testing.T) {
 	mysqlHost := os.Getenv("MYSQL_HOST")
-
 	database := "migrationtest"
 
 	// prepare clean database
 	connection, err := sql.Open("mysql", "root:@tcp("+mysqlHost+")/")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	defer func() {
 		err := connection.Close()
 		if err != nil {
@@ -31,23 +28,19 @@ func TestMySQLDriver(t *testing.T) {
 	}()
 
 	_, err = connection.Exec("CREATE DATABASE IF NOT EXISTS " + database)
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	_, err = connection.Exec("USE " + database)
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	driver, err := New("root:@tcp(" + mysqlHost + ")/" + database + "?multiStatements=true")
-
 	if err != nil {
 		t.Errorf("unable to open connection to mysql server: %s", err)
 	}
-
 	defer func() {
 		err := driver.Close()
 		if err != nil {
@@ -110,25 +103,21 @@ func TestMySQLDriver(t *testing.T) {
 	}
 
 	err = driver.Migrate(migrations[0])
-
 	if err != nil {
 		t.Errorf("unexpected error while running migration: %s", err)
 	}
 
 	_, err = connection.Exec("INSERT INTO test_table1 (id) values (1)")
-
 	if err != nil {
 		t.Errorf("unexpected error while testing if migration succeeded: %s", err)
 	}
 
 	_, err = connection.Exec("INSERT INTO test_table2 (id) values (1)")
-
 	if err != nil {
 		t.Errorf("unexpected error while testing if migration succeeded: %s", err)
 	}
 
 	err = driver.Migrate(migrations[1])
-
 	if err != nil {
 		t.Errorf("unexpected error while running migration: %s", err)
 	}
@@ -142,17 +131,14 @@ func TestMySQLDriver(t *testing.T) {
 	}
 
 	err = driver.Migrate(migrations[2])
-
 	if err == nil {
 		t.Error("expected an error while executing invalid statement, but did not receive any.")
 	}
 
 	versions, err := driver.Versions()
-
 	if err != nil {
 		t.Errorf("unexpected error while retriving version information: %s", err)
 	}
-
 	if len(versions) != 2 {
 		t.Errorf("expected %d versions to be applied, %d was actually applied.", 2, len(versions))
 	}
@@ -160,13 +146,11 @@ func TestMySQLDriver(t *testing.T) {
 	migrations[1].Direction = migration.Down
 
 	err = driver.Migrate(migrations[1])
-
 	if err != nil {
 		t.Errorf("unexpected error while running migration: %s", err)
 	}
 
 	versions, err = driver.Versions()
-
 	if err != nil {
 		t.Errorf("unexpected error while retriving version information: %s", err)
 	}
@@ -178,13 +162,11 @@ func TestMySQLDriver(t *testing.T) {
 
 func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
 	db, _, err := sqlmock.New()
-
 	if err != nil {
 		t.Fatalf("error opening stub database connection: %s", err)
 	}
 
 	_, err = NewFromDB(db)
-
 	if err == nil {
 		t.Error("expected error when creating MySQL driver with a non-MySQL database instance, but there was no error")
 	}
@@ -192,18 +174,15 @@ func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
 
 func TestCreateDriverUsingDBInstance(t *testing.T) {
 	mysqlHost := os.Getenv("MYSQL_HOST")
-
 	database := "migrationtest"
 
 	// prepare clean database
 	connection, err := sql.Open("mysql", "root:@tcp("+mysqlHost+")/")
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	_, err = connection.Exec("CREATE DATABASE IF NOT EXISTS " + database)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -223,13 +202,11 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 	}()
 
 	db, err := sql.Open("mysql", "root:@tcp("+mysqlHost+")/"+database+"?multiStatements=true")
-
 	if err != nil {
 		t.Fatalf("could not open MySQL connection: %s", err)
 	}
 
 	driver, err := NewFromDB(db)
-
 	if err != nil {
 		t.Errorf("unable to create MySQL driver: %s", err)
 	}

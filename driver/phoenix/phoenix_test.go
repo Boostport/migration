@@ -16,11 +16,9 @@ func TestPhoenixDriver(t *testing.T) {
 
 	// prepare clean database
 	connection, err := sql.Open("avatica", phoenixHost)
-
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	defer func() {
 		err := connection.Close()
 		if err != nil {
@@ -29,15 +27,12 @@ func TestPhoenixDriver(t *testing.T) {
 	}()
 
 	schema := "migrationtest"
-
 	_, err = connection.Exec("CREATE SCHEMA IF NOT EXISTS " + schema)
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	driver, err := New(phoenixHost + "/")
-
 	if err != nil {
 		t.Errorf("Unable to open connection to phoenix server: %s", err)
 	}
@@ -116,25 +111,21 @@ func TestPhoenixDriver(t *testing.T) {
 	}
 
 	err = driver.Migrate(migrations[0])
-
 	if err != nil {
 		t.Errorf("Unexpected error while running migration: %s", err)
 	}
 
 	_, err = connection.Exec("UPSERT INTO test_table1 (id) values (1)")
-
 	if err != nil {
 		t.Errorf("Unexpected error while testing if migration succeeded: %s", err)
 	}
 
 	_, err = connection.Exec("UPSERT INTO test_table2 (id) values (1)")
-
 	if err != nil {
 		t.Errorf("Unexpected error while testing if migration succeeded: %s", err)
 	}
 
 	err = driver.Migrate(migrations[1])
-
 	if err != nil {
 		t.Errorf("Unexpected error while running migration: %s", err)
 	}
@@ -148,50 +139,40 @@ func TestPhoenixDriver(t *testing.T) {
 	}
 
 	err = driver.Migrate(migrations[2])
-
 	if err == nil {
 		t.Error("Expected an error while executing invalid statement, but did not receive any.")
 	}
 
 	versions, err := driver.Versions()
-
 	if err != nil {
 		t.Errorf("Unexpected error while retriving version information: %s", err)
 	}
-
 	if len(versions) != 2 {
 		t.Errorf("Expected %d versions to be applied, %d was actually applied.", 2, len(versions))
 	}
 
 	migrations[1].Direction = migration.Down
-
 	err = driver.Migrate(migrations[1])
-
 	if err != nil {
 		t.Errorf("Unexpected error while running migration: %s", err)
 	}
 
 	versions, err = driver.Versions()
-
 	if err != nil {
 		t.Errorf("Unexpected error while retriving version information: %s", err)
 	}
-
 	if len(versions) != 1 {
 		t.Errorf("Expected %d versions to be applied, %d was actually applied.", 2, len(versions))
 	}
 }
 
 func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
-
 	db, _, err := sqlmock.New()
-
 	if err != nil {
 		t.Fatalf("Error opening stub database connection: %s", err)
 	}
 
 	_, err = NewFromDB(db)
-
 	if err == nil {
 		t.Error("Expected error when creating Phoenix driver with a non-Phoenix database instance, but there was no error")
 	}
@@ -202,11 +183,9 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 
 	// prepare clean database
 	connection, err := sql.Open("avatica", phoenixHost)
-
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	defer func() {
 		err := connection.Close()
 		if err != nil {
@@ -215,7 +194,6 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 	}()
 
 	schema := "migrationtest"
-
 	_, err = connection.Exec("CREATE SCHEMA IF NOT EXISTS " + schema)
 	if err != nil {
 		t.Fatal(err)
@@ -241,7 +219,6 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unable to create Avatica driver: %s", err)
 	}
-
 	defer func() {
 		err := driver.Close()
 		if err != nil {

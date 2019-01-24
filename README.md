@@ -157,7 +157,7 @@ driver, err := golang.New(source, updateVersion, applied)
 
 Here's a quick example:
 ```go
-source := golang.NewSource()
+source := migration.NewGolangMigrationSource()
 
 source.AddMigration("1_init", migration.Up, func() error {
     // Run up migration here

@@ -13,16 +13,13 @@ import (
 
 func TestPostgresDriver(t *testing.T) {
 	postgresHost := os.Getenv("POSTGRES_HOST")
-
 	database := "migrationtest"
 
 	// prepare clean database
 	connection, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/?sslmode=disable")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	defer func() {
 		err := connection.Close()
 		if err != nil {
@@ -31,11 +28,9 @@ func TestPostgresDriver(t *testing.T) {
 	}()
 
 	_, err = connection.Exec("CREATE DATABASE " + database)
-
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	defer func() {
 		_, err := connection.Exec("DROP DATABASE IF EXISTS " + database)
 		if err != nil {
@@ -44,11 +39,9 @@ func TestPostgresDriver(t *testing.T) {
 	}()
 
 	connection2, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/"+database+"?sslmode=disable")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	defer func() {
 		err := connection2.Close()
 		if err != nil {
@@ -57,7 +50,6 @@ func TestPostgresDriver(t *testing.T) {
 	}()
 
 	driver, err := New("postgres://postgres:@" + postgresHost + "/" + database + "?sslmode=disable")
-
 	if err != nil {
 		t.Errorf("unable to open connection to postgres server: %s", err)
 	}
@@ -110,25 +102,21 @@ func TestPostgresDriver(t *testing.T) {
 	}
 
 	err = driver.Migrate(migrations[0])
-
 	if err != nil {
 		t.Errorf("unexpected error while running migration: %s", err)
 	}
 
 	_, err = connection2.Exec("INSERT INTO test_table1 (id) values (1)")
-
 	if err != nil {
 		t.Errorf("unexpected error while testing if migration succeeded: %s", err)
 	}
 
 	_, err = connection2.Exec("INSERT INTO test_table2 (id) values (1)")
-
 	if err != nil {
 		t.Errorf("unexpected error while testing if migration succeeded: %s", err)
 	}
 
 	err = driver.Migrate(migrations[1])
-
 	if err != nil {
 		t.Errorf("unexpected error while running migration: %s", err)
 	}
@@ -142,17 +130,14 @@ func TestPostgresDriver(t *testing.T) {
 	}
 
 	err = driver.Migrate(migrations[2])
-
 	if err == nil {
 		t.Error("expected an error while executing invalid statement, but did not receive any.")
 	}
 
 	versions, err := driver.Versions()
-
 	if err != nil {
 		t.Errorf("unexpected error while retriving version information: %s", err)
 	}
-
 	if len(versions) != 2 {
 		t.Errorf("expected %d versions to be applied, %d was actually applied.", 2, len(versions))
 	}
@@ -160,17 +145,14 @@ func TestPostgresDriver(t *testing.T) {
 	migrations[1].Direction = migration.Down
 
 	err = driver.Migrate(migrations[1])
-
 	if err != nil {
 		t.Errorf("unexpected error while running migration: %s", err)
 	}
 
 	versions, err = driver.Versions()
-
 	if err != nil {
 		t.Errorf("unexpected error while retriving version information: %s", err)
 	}
-
 	if len(versions) != 1 {
 		t.Errorf("expected %d versions to be applied, %d was actually applied.", 2, len(versions))
 	}
@@ -183,13 +165,11 @@ func TestPostgresDriver(t *testing.T) {
 
 func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
 	db, _, err := sqlmock.New()
-
 	if err != nil {
 		t.Fatalf("error opening stub database connection: %s", err)
 	}
 
 	_, err = NewFromDB(db)
-
 	if err == nil {
 		t.Error("expected error when creating Postgres driver with a non-Postgres database instance, but there was no error")
 	}
@@ -197,16 +177,13 @@ func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
 
 func TestCreateDriverUsingDBInstance(t *testing.T) {
 	postgresHost := os.Getenv("POSTGRES_HOST")
-
 	database := "migrationtest"
 
 	// prepare clean database
 	connection, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/?sslmode=disable")
-
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	defer func() {
 		err := connection.Close()
 		if err != nil {
@@ -215,7 +192,6 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 	}()
 
 	_, err = connection.Exec("CREATE DATABASE " + database)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -228,13 +204,11 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 	}()
 
 	db, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/"+database+"?sslmode=disable")
-
 	if err != nil {
 		t.Fatalf("could not open Postgres connection: %s", err)
 	}
 
 	driver, err := NewFromDB(db)
-
 	if err != nil {
 		t.Errorf("unable to create postgres driver: %s", err)
 	}

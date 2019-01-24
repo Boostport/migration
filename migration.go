@@ -91,29 +91,24 @@ func (b byID) Less(i, j int) bool { return b[i].Less(b[j]) }
 // the migration is up or down, and max is the maximum number of migrations to apply. If max is set to 0,
 // then there is no limit on the number of migrations to apply.
 func Migrate(driver Driver, migrations Source, direction Direction, max int) (int, error) {
-
 	count := 0
 
 	m, err := getMigrations(migrations)
-
 	if err != nil {
 		return count, err
 	}
 
 	appliedMigrations, err := driver.Versions()
-
 	if err != nil {
 		return count, err
 	}
 
 	migrationsToApply := planMigrations(m, appliedMigrations, direction, max)
-
 	for _, plannedMigration := range migrationsToApply {
 		logPrintf("Applying migration (%s) named '%s'...", direction.String(), plannedMigration.ID)
 
 		err = driver.Migrate(plannedMigration)
 		if err != nil {
-
 			errorMessage := "Error while running migration " + plannedMigration.ID
 
 			if plannedMigration.Direction == Up {
@@ -121,7 +116,6 @@ func Migrate(driver Driver, migrations Source, direction Direction, max int) (in
 			} else {
 				errorMessage += " (down)"
 			}
-
 			return count, fmt.Errorf(errorMessage+": %s", err)
 		}
 
@@ -134,13 +128,10 @@ func Migrate(driver Driver, migrations Source, direction Direction, max int) (in
 }
 
 func getMigrations(migrations Source) ([]*Migration, error) {
-
 	var m []*Migration
-
 	tempMigrations := map[string]*Migration{}
 
 	files, err := migrations.ListMigrationFiles()
-
 	if err != nil {
 		return m, err
 	}
@@ -148,11 +139,9 @@ func getMigrations(migrations Source) ([]*Migration, error) {
 	regex := regexp.MustCompile(`(\d*_.*)\.(up|down)\..*`)
 
 	for _, file := range files {
-
 		matches := regex.FindStringSubmatch(file)
 
 		if len(matches) > 0 && file == matches[0] {
-
 			id := matches[1]
 			direction := matches[2]
 
@@ -163,19 +152,16 @@ func getMigrations(migrations Source) ([]*Migration, error) {
 			}
 
 			reader, err := migrations.GetMigrationFile(file)
-
 			if err != nil {
 				return m, fmt.Errorf("Error getting migrations: %s", err)
 			}
 
 			contents, err := ioutil.ReadAll(reader)
-
 			if err != nil {
 				return m, fmt.Errorf("Error getting migration content: %s", err)
 			}
 
 			parsed, err := parser.Parse(bytes.NewReader(contents))
-
 			if err != nil {
 				return m, fmt.Errorf("Error parsing migration %s: %s", id, err)
 			}
@@ -198,7 +184,6 @@ func getMigrations(migrations Source) ([]*Migration, error) {
 }
 
 func planMigrations(migrations []*Migration, appliedMigrations []string, direction Direction, max int) []*PlannedMigration {
-
 	var applied []*Migration
 
 	for _, appliedMigration := range appliedMigrations {
@@ -233,7 +218,6 @@ func planMigrations(migrations []*Migration, appliedMigrations []string, directi
 	}
 
 	for _, v := range toApply[0:toApplyCount] {
-
 		if direction == Up {
 			result = append(result, &PlannedMigration{
 				Migration: v,

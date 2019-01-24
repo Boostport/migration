@@ -21,11 +21,9 @@ const postgresTableName = "schema_migration"
 // The DSN is documented here: https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
 func New(dsn string) (m.Driver, error) {
 	db, err := sql.Open("postgres", dsn)
-
 	if err != nil {
 		return nil, err
 	}
-
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
@@ -33,7 +31,6 @@ func New(dsn string) (m.Driver, error) {
 	d := &Driver{
 		db: db,
 	}
-
 	if err := d.ensureVersionTableExists(); err != nil {
 		return nil, err
 	}
@@ -46,7 +43,6 @@ func NewFromDB(db *sql.DB) (m.Driver, error) {
 	if _, ok := db.Driver().(*pq.Driver); !ok {
 		return nil, errors.New("database instance is not using the postgres driver")
 	}
-
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
@@ -54,7 +50,6 @@ func NewFromDB(db *sql.DB) (m.Driver, error) {
 	d := &Driver{
 		db: db,
 	}
-
 	if err := d.ensureVersionTableExists(); err != nil {
 		return nil, err
 	}
@@ -75,27 +70,21 @@ func (driver *Driver) ensureVersionTableExists() error {
 
 // Migrate runs a migration.
 func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
-
 	var (
 		migrationStatements *parser.ParsedMigration
 		insertVersion       string
 	)
 
 	if migration.Direction == m.Up {
-
 		migrationStatements = migration.Up
 		insertVersion = "INSERT INTO " + postgresTableName + " (version) VALUES ($1)"
-
 	} else if migration.Direction == m.Down {
-
 		migrationStatements = migration.Down
 		insertVersion = "DELETE FROM " + postgresTableName + " WHERE version=$1"
 	}
 
 	if migrationStatements.UseTransaction {
-
 		tx, err := driver.db.Begin()
-
 		if err != nil {
 			return err
 		}
@@ -119,20 +108,16 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 		if _, err = tx.Exec(insertVersion, migration.ID); err != nil {
 			return fmt.Errorf("error updating migration versions: %s", err)
 		}
-
 	} else {
-
 		for _, statement := range migrationStatements.Statements {
 			if _, err := driver.db.Exec(statement); err != nil {
 				return fmt.Errorf("error executing statement: %s\n%s", err, statement)
 			}
 		}
-
 		if _, err = driver.db.Exec(insertVersion, migration.ID); err != nil {
 			return fmt.Errorf("error updating migration versions: %s", err)
 		}
 	}
-
 	return
 }
 
@@ -141,24 +126,19 @@ func (driver *Driver) Versions() ([]string, error) {
 	var versions []string
 
 	rows, err := driver.db.Query("SELECT version FROM " + postgresTableName + " ORDER BY version DESC")
-
 	if err != nil {
 		return versions, err
 	}
-
 	defer func() {
 		_ = rows.Close()
 	}()
 
 	for rows.Next() {
 		var version string
-
 		err = rows.Scan(&version)
-
 		if err != nil {
 			return versions, err
 		}
-
 		versions = append(versions, version)
 	}
 
