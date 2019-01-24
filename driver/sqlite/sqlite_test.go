@@ -67,31 +67,26 @@ func TestSQLiteDriver(t *testing.T) {
 		}
 
 		err = driver.Migrate(migrations[0])
-
 		if err != nil {
 			t.Errorf("unexpected error while running migration: %s", err)
 		}
 
 		_, err = driver.(*Driver).db.Exec("INSERT INTO test_table1 (id) values (1)")
-
 		if err != nil {
 			t.Errorf("unexpected error while testing if migration succeeded: %s", err)
 		}
 
 		_, err = driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)")
-
 		if err != nil {
 			t.Errorf("unexpected error while testing if migration succeeded: %s", err)
 		}
 
 		err = driver.Migrate(migrations[1])
-
 		if err != nil {
 			t.Errorf("unexpected error while running migration: %s", err)
 		}
 
 		if _, err := driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
-
 			reg := regexp.MustCompile(`^no such table: .+`)
 
 			if !reg.MatchString(err.Error()) {
@@ -102,17 +97,14 @@ func TestSQLiteDriver(t *testing.T) {
 		}
 
 		err = driver.Migrate(migrations[2])
-
 		if err == nil {
 			t.Error("expected an error while executing invalid statement, but did not receive any.")
 		}
 
 		versions, err := driver.Versions()
-
 		if err != nil {
 			t.Errorf("unexpected error while retriving version information: %s", err)
 		}
-
 		if len(versions) != 2 {
 			t.Errorf("expected %d versions to be applied, %d was actually applied.", 2, len(versions))
 		}
@@ -120,17 +112,14 @@ func TestSQLiteDriver(t *testing.T) {
 		migrations[1].Direction = migration.Down
 
 		err = driver.Migrate(migrations[1])
-
 		if err != nil {
 			t.Errorf("unexpected error while running migration: %s", err)
 		}
 
 		versions, err = driver.Versions()
-
 		if err != nil {
 			t.Errorf("unexpected error while retriving version information: %s", err)
 		}
-
 		if len(versions) != 1 {
 			t.Errorf("expected %d versions to be applied, %d was actually applied", 2, len(versions))
 		}
@@ -149,13 +138,11 @@ func TestSQLiteDriver(t *testing.T) {
 
 func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
 	db, _, err := sqlmock.New()
-
 	if err != nil {
 		t.Fatalf("error opening stub database connection: %s", err)
 	}
 
 	_, err = NewFromDB(db)
-
 	if err == nil {
 		t.Error("expected error when creating SQLite driver with a non-SQLite database instance, but there was no error")
 	}
@@ -163,13 +150,11 @@ func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
 
 func TestCreateDriverUsingDBInstance(t *testing.T) {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared&_busy_timeout=50000")
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	driver, err := NewFromDB(db)
-
 	if err != nil {
 		t.Errorf("unable to create SQLite driver: %s", err)
 	}

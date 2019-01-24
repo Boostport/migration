@@ -22,11 +22,9 @@ const phoenixTableName = "schema_migration"
 // The DSN is documented here: https://calcite.apache.org/avatica/docs/go_client_reference.html#dsn-data-source-name
 func New(dsn string) (m.Driver, error) {
 	db, err := sql.Open("avatica", dsn)
-
 	if err != nil {
 		return nil, err
 	}
-
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
@@ -34,7 +32,6 @@ func New(dsn string) (m.Driver, error) {
 	p := &Driver{
 		db: db,
 	}
-
 	if err := p.ensureVersionTableExists(); err != nil {
 		return nil, err
 	}
@@ -77,7 +74,6 @@ func (driver *Driver) ensureVersionTableExists() error {
 // Migrate runs a migration.
 func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
 	// TODO: Driver does not support DDL statements in a transaction yet :( See PHOENIX-3358
-
 	var migrationStatements *parser.ParsedMigration
 
 	if migration.Direction == m.Up {
@@ -92,9 +88,7 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) error {
 		splitted := strings.Split(sqlStmt, ";")
 
 		for _, content := range splitted {
-
 			if len(strings.TrimSpace(content)) > 0 {
-
 				if _, err := driver.db.Exec(content); err != nil {
 					return fmt.Errorf("Error executing statement: %s\n%s", err, content)
 				}
@@ -120,24 +114,19 @@ func (driver *Driver) Versions() ([]string, error) {
 	var versions []string
 
 	rows, err := driver.db.Query("SELECT version FROM " + phoenixTableName + " ORDER BY version DESC")
-
 	if err != nil {
 		return versions, err
 	}
-
 	defer func() {
 		_ = rows.Close()
 	}()
 
 	for rows.Next() {
 		var version string
-
 		err = rows.Scan(&version)
-
 		if err != nil {
 			return versions, err
 		}
-
 		versions = append(versions, version)
 	}
 

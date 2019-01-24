@@ -84,7 +84,6 @@ func getMockDriver() *mockDriver {
 }
 
 func TestMigrationSorting(t *testing.T) {
-
 	unsorted := []*Migration{
 		{
 			ID: "1475461906_remove_name_column",
@@ -135,7 +134,6 @@ func TestMigrationSorting(t *testing.T) {
 }
 
 func TestMigrationSortingWithNonNumericIds(t *testing.T) {
-
 	unsorted := []*Migration{
 		{
 			ID: "b_init",
@@ -186,7 +184,6 @@ func TestMigrationSortingWithNonNumericIds(t *testing.T) {
 }
 
 func TestGobinDataMigrationSource(t *testing.T) {
-
 	assetMigration := &GoBindataMigrationSource{
 		Asset:    Asset,
 		AssetDir: AssetDir,
@@ -194,71 +191,56 @@ func TestGobinDataMigrationSource(t *testing.T) {
 	}
 
 	driver := getMockDriver()
-
 	applied, err := Migrate(driver, assetMigration, Up, 0)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing go-bindata migration: %s", err)
 	}
-
 	if applied != 3 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
 	}
-
 	if len(driver.applied) != 3 {
 		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
 	}
 }
 
 func TestPackrMigrationSource(t *testing.T) {
-
 	assetMigration := &PackrMigrationSource{
 		Box: packr.NewBox("."),
 		Dir: "test-migrations",
 	}
 
 	driver := getMockDriver()
-
 	applied, err := Migrate(driver, assetMigration, Up, 0)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing packr migration: %s", err)
 	}
-
 	if applied != 3 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
 	}
-
 	if len(driver.applied) != 3 {
 		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
 	}
 }
 
 func TestPackrMigrationSourceWithoutDir(t *testing.T) {
-
 	assetMigration := &PackrMigrationSource{
 		Box: packr.NewBox("test-migrations"),
 	}
 
 	driver := getMockDriver()
-
 	applied, err := Migrate(driver, assetMigration, Up, 0)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing packr migration: %s", err)
 	}
-
 	if applied != 3 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
 	}
-
 	if len(driver.applied) != 3 {
 		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
 	}
 }
 
 func TestMigrationWithHoles(t *testing.T) {
-
 	memoryMigration := &MemoryMigrationSource{
 		Files: map[string]string{
 			"1_init.up.sql":            "",
@@ -269,17 +251,13 @@ func TestMigrationWithHoles(t *testing.T) {
 	}
 
 	driver := getMockDriver()
-
 	applied, err := Migrate(driver, memoryMigration, Up, 0)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing asset migration: %s", err)
 	}
-
 	if applied != 2 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 2, applied)
 	}
-
 	if len(driver.applied) != 2 {
 		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
 	}
@@ -291,22 +269,18 @@ func TestMigrationWithHoles(t *testing.T) {
 	memoryMigration.Files["4_another_update.up.sql"] = ""
 
 	applied2, err := Migrate(driver, memoryMigration, Up, 0)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing asset migration: %s", err)
 	}
-
 	if applied2 != 2 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 2, applied2)
 	}
-
 	if len(driver.applied) != 4 {
 		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied2, len(driver.applied))
 	}
 }
 
 func TestMigrateUpWithLimit(t *testing.T) {
-
 	memoryMigration := &MemoryMigrationSource{
 		Files: map[string]string{
 			"1_init.up.sql":             "",
@@ -321,38 +295,30 @@ func TestMigrateUpWithLimit(t *testing.T) {
 	}
 
 	driver := getMockDriver()
-
 	applied, err := Migrate(driver, memoryMigration, Up, 2)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing asset migration: %s", err)
 	}
-
 	if applied != 2 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 2, applied)
 	}
-
 	if len(driver.applied) != 2 {
 		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
 	}
 
 	applied2, err := Migrate(driver, memoryMigration, Up, 2)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing asset migration: %s", err)
 	}
-
 	if applied2 != 2 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 2, applied2)
 	}
-
 	if len(driver.applied) != 4 {
 		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied2, len(driver.applied))
 	}
 }
 
 func TestMigrateDownWithLimit(t *testing.T) {
-
 	memoryMigration := &MemoryMigrationSource{
 		Files: map[string]string{
 			"1_init.up.sql":             "",
@@ -367,38 +333,30 @@ func TestMigrateDownWithLimit(t *testing.T) {
 	}
 
 	driver := getMockDriver()
-
 	applied, err := Migrate(driver, memoryMigration, Up, 0)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing asset migration: %s", err)
 	}
-
 	if applied != 4 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 4, applied)
 	}
-
 	if len(driver.applied) != 4 {
 		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
 	}
 
 	applied2, err := Migrate(driver, memoryMigration, Down, 2)
-
 	if err != nil {
 		t.Errorf("Unexpected error while performing asset migration: %s", err)
 	}
-
 	if applied2 != 2 {
 		t.Errorf("Expected %d migrations to be applied, %d applied.", 2, applied2)
 	}
-
 	if len(driver.applied) != 2 {
 		t.Errorf("There should only be %d migrations after migrating down", 2)
 	}
 }
 
 func TestMigrationWithError(t *testing.T) {
-
 	memoryMigration := &MemoryMigrationSource{
 		Files: map[string]string{
 			"1_init.up.sql":     "",
@@ -409,23 +367,18 @@ func TestMigrationWithError(t *testing.T) {
 	}
 
 	driver := getMockDriver()
-
 	applied, err := Migrate(driver, memoryMigration, Up, 2)
-
 	if err == nil {
 		t.Error("Expected error while running migration, but there was no error")
 	}
-
 	if applied != 1 {
 		t.Errorf("%d migrations should be applied, but %d was applied.", 1, applied)
 	}
 
 	applied2, err := Migrate(driver, memoryMigration, Down, 1)
-
 	if err == nil {
 		t.Error("Expected error while running migration, but there was no error")
 	}
-
 	if applied2 != 0 {
 		t.Errorf("No migrations should be applied, but %d was applied.", applied2)
 	}

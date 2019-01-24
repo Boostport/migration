@@ -78,26 +78,22 @@ func (driver *Driver) ensureVersionTableExists() error {
 
 // Migrate runs a migration.
 func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
-
 	var (
 		migrationStatements *parser.ParsedMigration
 		insertVersion       string
 	)
 
 	if migration.Direction == m.Up {
-
 		migrationStatements = migration.Up
 		insertVersion = "INSERT INTO " + sqliteTableName + " (version) VALUES (?)"
 
 	} else if migration.Direction == m.Down {
-
 		migrationStatements = migration.Down
 		insertVersion = "DELETE FROM " + sqliteTableName + " WHERE version=?"
 	}
 
 	if driver.useTransactions {
 		tx, err := driver.db.Begin()
-
 		if err != nil {
 			return err
 		}
@@ -113,27 +109,21 @@ func (driver *Driver) Migrate(migration *m.PlannedMigration) (err error) {
 		}()
 
 		for _, statement := range migrationStatements.Statements {
-
 			if _, err = tx.Exec(statement); err != nil {
-
 				return fmt.Errorf("error executing statement: %s\n%s", err, statement)
 			}
 		}
 
 		if _, err = tx.Exec(insertVersion, migration.ID); err != nil {
-
 			return fmt.Errorf("error updating migration versions: %s", err)
 		}
 	} else {
-
 		for _, statement := range migrationStatements.Statements {
 			if _, err := driver.db.Exec(statement); err != nil {
 				return fmt.Errorf("error executing statement: %s\n%s", err, statement)
 			}
 		}
-
 		if _, err = driver.db.Exec(insertVersion, migration.ID); err != nil {
-
 			return fmt.Errorf("error updating migration versions: %s", err)
 		}
 	}
@@ -146,11 +136,9 @@ func (driver *Driver) Versions() ([]string, error) {
 	var versions []string
 
 	rows, err := driver.db.Query("SELECT version FROM " + sqliteTableName + " ORDER BY version DESC")
-
 	if err != nil {
 		return versions, err
 	}
-
 	defer func() {
 		_ = rows.Close()
 	}()
