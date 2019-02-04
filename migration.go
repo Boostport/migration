@@ -218,17 +218,10 @@ func planMigrations(migrations []*Migration, appliedMigrations []string, directi
 	}
 
 	for _, v := range toApply[0:toApplyCount] {
-		if direction == Up {
-			result = append(result, &PlannedMigration{
-				Migration: v,
-				Direction: Up,
-			})
-		} else if direction == Down {
-			result = append(result, &PlannedMigration{
-				Migration: v,
-				Direction: Down,
-			})
-		}
+		result = append(result, &PlannedMigration{
+			Migration: v,
+			Direction: direction,
+		})
 	}
 
 	return result
