@@ -30,3 +30,26 @@ services:
 
   postgres:
     image: postgres:11-alpine
+
+  lint:
+    image: golang:1.12-alpine
+    working_dir: /source
+    command: >
+      sh -c "apk --no-cache --no-progress add gcc git make musl-dev;
+             go install github.com/golangci/golangci-lint/cmd/golangci-lint;
+             make sanity-check"
+    volumes:
+      - .:/source
+      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
+
+  update-test-bindata:
+    image: golang:1.12-alpine
+    working_dir: /source
+    command: >
+      sh -c "apk --no-cache --no-progress add gcc git musl-dev;
+             go install github.com/go-bindata/go-bindata/go-bindata;
+             go-bindata -o bindata_test.go -pkg migration test-migrations/;
+             echo \"go-bindata test data generated.\""
+    volumes:
+      - .:/source
+      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
