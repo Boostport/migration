@@ -8,7 +8,7 @@ import (
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
-	"github.com/apache/calcite-avatica-go/v3/errors"
+	"github.com/apache/calcite-avatica-go/v4/errors"
 )
 
 func TestPhoenixDriver(t *testing.T) {

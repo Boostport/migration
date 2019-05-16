@@ -1,5 +1,5 @@
 box:
-  id: golang:1.11-alpine
+  id: golang:1.12-alpine
   cmd: /bin/sh
   env:
     GO111MODULE: on
