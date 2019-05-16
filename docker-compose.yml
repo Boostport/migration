@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  dev:
+    image: golang:1.12-alpine
+    command: >
+      sh -c "apk --no-cache --no-progress add gcc git musl-dev;
+             go get github.com/unchartedsoftware/witch;
+             cd /source;
+             witch --cmd=\"go test -v -p 1 ./...\" --watch=\"*.mod,**/*.go\""
+    environment:
+      PHOENIX_HOST: http://phoenix:8765
+      MYSQL_HOST: mysql:3306
+      POSTGRES_HOST: postgres:5432
+    volumes:
+      - .:/source
+      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
+    depends_on:
+      - mysql
+      - phoenix
+      - postgres
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+  phoenix:
+    image: boostport/hbase-phoenix-all-in-one:2.0-5.0
+
+  postgres:
+    image: postgres:11-alpine
