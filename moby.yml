@@ -5,18 +5,18 @@ services:
       - "8765"
 
   - id: mysql
-    image: mysql:5
+    image: mysql:8
     env:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
     ports:
       - "3306"
 
   - id: postgres
-    image: postgres:10-alpine
+    image: postgres:11-alpine
     ports:
       - "5432"
 dev:
-  image: golang:1.11-alpine
+  image: golang:1.12-alpine
   env:
     PHOENIX_HOST: http://phoenix:8765
     MYSQL_HOST: mysql:3306
@@ -25,7 +25,7 @@ dev:
     - type: script
       name: Install build tools
       options:
-        command: apk --no-cache --no-progress add build-base git
+        command: apk --no-cache --no-progress add gcc git musl-dev
 
   reload:
     - type: script

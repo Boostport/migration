@@ -8,10 +8,10 @@ no-response-timeout: 20
 
 services:
   - boostport/hbase-phoenix-all-in-one:2.0-5.0
-  - id: mysql:5
+  - id: mysql:8
     env:
       MYSQL_ALLOW_EMPTY_PASSWORD: yes
-  - postgres:10-alpine
+  - postgres:11-alpine
 build:
   steps:
     - script:
@@ -31,7 +31,7 @@ build:
     - script:
       name: set up build tools
       code: |
-        apk --no-cache --no-progress add build-base git make
+        apk --no-cache --no-progress add gcc git make musl-dev
 
     - script:
         name: install golangci-lint
