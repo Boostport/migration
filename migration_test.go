@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/Boostport/migration/parser"
-	"github.com/gobuffalo/packr"
+	"github.com/gobuffalo/packr/v2"
 )
 
 func TestDirectionString(t *testing.T) {
@@ -205,7 +205,7 @@ func TestGobinDataMigrationSource(t *testing.T) {
 
 func TestPackrMigrationSource(t *testing.T) {
 	assetMigration := &PackrMigrationSource{
-		Box: packr.NewBox("."),
+		Box: packr.New("migrations", "."),
 		Dir: "test-migrations",
 	}
 
@@ -224,7 +224,7 @@ func TestPackrMigrationSource(t *testing.T) {
 
 func TestPackrMigrationSourceWithoutDir(t *testing.T) {
 	assetMigration := &PackrMigrationSource{
-		Box: packr.NewBox("test-migrations"),
+		Box: packr.New("test-migrations", "test-migrations"),
 	}
 
 	driver := getMockDriver()
