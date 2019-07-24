@@ -23,7 +23,7 @@ Simple and pragmatic migrations for Go applications.
 ```go
 // Create migration source
 packrSource := &migration.PackrMigrationSource{
-    Box: packr.NewBox("migrations"),
+    Box: packr.New("migrations", "migrations"),
 }
 
 // Create driver
@@ -101,14 +101,14 @@ END
 Assuming your migration files are in `migrations/`, initialize a `PackrMigrationSource`:
 ```go
 packrSource := &migration.PackrMigrationSource{
-	Box: packr.NewBox("migrations"),
+	Box: packr.New("migrations", "migrations"),
 }
 ```
 
 If your migrations are contained in a subdirectory inside your packr box, you can point to it using the `Dir` property:
 ```go
 packrSource := &migration.PackrMigrationSource{
-	Box: packr.NewBox("."),
+	Box: packr.New("migrations", "."),
 	Dir: "migrations",
 }
 ```
