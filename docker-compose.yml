@@ -2,7 +2,7 @@ version: '3'
 
 services:
   dev:
-    image: golang:1.12-alpine
+    image: golang:1.13-alpine
     command: >
       sh -c "apk --no-cache --no-progress add gcc git musl-dev;
              go get github.com/unchartedsoftware/witch;
@@ -32,7 +32,7 @@ services:
     image: postgres:11-alpine
 
   lint:
-    image: golang:1.12-alpine
+    image: golang:1.13-alpine
     working_dir: /source
     command: >
       sh -c "apk --no-cache --no-progress add gcc git make musl-dev;
@@ -43,7 +43,7 @@ services:
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
 
   update-test-bindata:
-    image: golang:1.12-alpine
+    image: golang:1.13-alpine
     working_dir: /source
     command: >
       sh -c "apk --no-cache --no-progress add gcc git musl-dev;
