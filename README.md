@@ -1,6 +1,6 @@
 # Migration
 [![GoDoc](https://godoc.org/github.com/Boostport/migration?status.png)](https://godoc.org/github.com/Boostport/migration)
-[![wercker status](https://app.wercker.com/status/f4ba0d00eb6ed7ef404a11084507e09d/s/master "wercker status")](https://app.wercker.com/project/byKey/f4ba0d00eb6ed7ef404a11084507e09d)
+![](https://github.com/Boostport/migration/workflows/Test/badge.svg)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/caad2af95fa34fd23a2e/test_coverage)](https://codeclimate.com/github/Boostport/migration/test_coverage)
 
 Simple and pragmatic migrations for Go applications.
