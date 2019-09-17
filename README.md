@@ -1,6 +1,6 @@
 # Migration
 [![GoDoc](https://godoc.org/github.com/Boostport/migration?status.png)](https://godoc.org/github.com/Boostport/migration)
-![](https://github.com/Boostport/migration/workflows/Tests/badge.svg)
+[![Tests Status](https://github.com/Boostport/migration/workflows/Tests/badge.svg)](https://github.com/Boostport/migration)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/caad2af95fa34fd23a2e/test_coverage)](https://codeclimate.com/github/Boostport/migration/test_coverage)
 
 Simple and pragmatic migrations for Go applications.
