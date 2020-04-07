@@ -22,7 +22,9 @@ jobs:
         options: --health-cmd "while ! mysql -e \"select 1\" -uroot >/dev/null 2>&1; do sleep 1; done" --health-interval 10s --health-timeout 5s --health-retries 5
 
       postgres:
-        image: postgres:11-alpine
+        image: postgres:12-alpine
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
