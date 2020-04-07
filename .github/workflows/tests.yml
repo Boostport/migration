@@ -35,7 +35,7 @@ jobs:
           chmod +x /tmp/cc-test-reporter
           /tmp/cc-test-reporter before-build
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Run golangci-lint checks
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
