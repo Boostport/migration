@@ -22,12 +22,14 @@ Simple and pragmatic migrations for Go applications.
 ## Quickstart
 ```go
 // Create migration source
-packrSource := &migration.PackrMigrationSource{
-    Box: packr.New("migrations", "migrations"),
+dir := pkger.Include("/migrations") // Remember to include forward slash at the beginning of the directory's name
+
+packrSource := &migration.PkgerMigrationSource{
+    Dir: dir,
 }
 
 // Create driver
-driver, err := phoenix.New("http://localhost:8765")
+driver, err := mysql.New("root:@tcp(localhost)/mydatabase?multiStatements=true")
 
 // Run all up migrations
 applied, err := Migrate(driver, packrSource, migration.Up, 0)
@@ -96,6 +98,22 @@ END
 ```
 
 ## Embedding migration files
+
+### Using [pkger](https://github.com/markbates/pkger)
+This is the recommended method for embedding migration files as the author of packr has announced he will be focusing his
+efforts on pkger.
+
+Assuming your migration files are in Assuming your migration files are in `migrations/`, initialize `pkger` and a `PkgerMigrationSource`:
+```go
+dir := pkger.Include("/test-migrations") // Remember to include forward slash at the beginning of the directory's name
+
+pkgerSource := &PkgerMigrationSource{
+    Dir: dir,
+}
+```
+
+During development, pkger will read the migration files from disk. When building for production, run `pkger` to generate
+a Go file containing your migrations. For more information, see the [pkger documenation](https://github.com/markbates/pkger#usage).
 
 ### Using [packr](https://github.com/gobuffalo/packr)
 Assuming your migration files are in `migrations/`, initialize a `PackrMigrationSource`:

@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"path"
 	"strings"
 	"sync"
+
+	"github.com/markbates/pkger"
 )
 
 // Source is an interface that defines how a source can find and read migration files.
@@ -88,6 +91,40 @@ func (p PackrMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
 	file, err := p.Box.Find(path.Join(p.Dir, name))
 
 	return bytes.NewReader(file), err
+}
+
+// PkgerMigrationSource holds the underlying pkger and dir info
+type PkgerMigrationSource struct {
+	// The path in to use
+	Dir string
+}
+
+// ListMigrationFiles returns a list of pkger migration files
+func (p PkgerMigrationSource) ListMigrationFiles() ([]string, error) {
+
+	var migrations []string
+
+	err := pkger.Walk(p.Dir, func(path string, info os.FileInfo, err error) error {
+
+		if info.IsDir() {
+			return nil
+		}
+
+		migrations = append(migrations, info.Name())
+
+		return nil
+	})
+
+	if err != nil {
+		return migrations, fmt.Errorf("error listing migration files: %s", err)
+	}
+
+	return migrations, nil
+}
+
+// GetMigrationFile gets a pkger migration file
+func (p PkgerMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
+	return pkger.Open(path.Join(p.Dir, name))
 }
 
 // GolangMigrationSource implements migration.Source
