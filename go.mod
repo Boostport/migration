@@ -12,6 +12,6 @@ require (
 	github.com/lib/pq v1.6.0
 	github.com/markbates/pkger v0.17.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/unchartedsoftware/witch v0.0.0-20200123142624-1dcdd0f1305a
+	github.com/unchartedsoftware/witch v0.0.0-20200617171400-4f405404126f
 	github.com/urfave/cli v1.22.4 // indirect
 )
