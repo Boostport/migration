@@ -49,7 +49,7 @@ services:
     working_dir: /source
     command: >
       sh -c "apk --no-cache --no-progress add gcc git musl-dev;
-             go install github.com/go-bindata/go-bindata/go-bindata;
+             go install github.com/go-bindata/go-bindata/v3/go-bindata;
              go-bindata -o bindata_test.go -pkg migration test-migrations/;
              echo \"go-bindata test data generated.\""
     volumes:
