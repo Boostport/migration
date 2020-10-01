@@ -8,7 +8,7 @@ import (
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	avatica "github.com/apache/calcite-avatica-go/v4"
+	avatica "github.com/apache/calcite-avatica-go/v5"
 )
 
 // Driver is the phoenix migration.Driver implementation
