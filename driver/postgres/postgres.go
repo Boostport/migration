@@ -7,7 +7,7 @@ import (
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v4/stdlib"
 )
 
 // Driver is the postgres migration.Driver implementation
@@ -18,9 +18,9 @@ type Driver struct {
 const postgresTableName = "schema_migration"
 
 // New creates a new Driver driver.
-// The DSN is documented here: https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+// The DSN is documented here: https://pkg.go.dev/github.com/jackc/pgx/v4@v4.10.1/stdlib#pkg-overview
 func New(dsn string) (m.Driver, error) {
-	db, err := sql.Open("postgres", dsn)
+	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func New(dsn string) (m.Driver, error) {
 
 // NewFromDB returns a postgres driver from a sql.DB
 func NewFromDB(db *sql.DB) (m.Driver, error) {
-	if _, ok := db.Driver().(*pq.Driver); !ok {
+	if _, ok := db.Driver().(*stdlib.Driver); !ok {
 		return nil, errors.New("database instance is not using the postgres driver")
 	}
 	if err := db.Ping(); err != nil {

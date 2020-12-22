@@ -2,13 +2,15 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"os"
 	"testing"
 
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	sqlmock "github.com/DATA-DOG/go-sqlmock"
-	"github.com/lib/pq"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jackc/pgconn"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 func TestPostgresDriver(t *testing.T) {
@@ -16,7 +18,7 @@ func TestPostgresDriver(t *testing.T) {
 	database := "migrationtest"
 
 	// prepare clean database
-	connection, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/?sslmode=disable")
+	connection, err := sql.Open("pgx", "postgres://postgres:@"+postgresHost+"/?sslmode=disable")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +40,7 @@ func TestPostgresDriver(t *testing.T) {
 		}
 	}()
 
-	connection2, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/"+database+"?sslmode=disable")
+	connection2, err := sql.Open("pgx", "postgres://postgres:@"+postgresHost+"/"+database+"?sslmode=disable")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,8 +124,13 @@ func TestPostgresDriver(t *testing.T) {
 	}
 
 	if _, err = connection2.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
-		if err.(*pq.Error).Code.Name() != "undefined_table" {
-			t.Errorf("received an error while inserting into a non-existent table, but it was not a undefined_table error: %s", err)
+
+		var pgxerr *pgconn.PgError
+
+		if errors.As(err, &pgxerr) {
+			if pgxerr.Code != "42P01" /* undefined_table */ {
+				t.Errorf("received an error while inserting into a non-existent table, but it was not a undefined_table error: %s", err)
+			}
 		}
 	} else {
 		t.Error("expected an error while inserting into non-existent table, but did not receive any.")
@@ -180,7 +187,7 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 	database := "migrationtest"
 
 	// prepare clean database
-	connection, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/?sslmode=disable")
+	connection, err := sql.Open("pgx", "postgres://postgres:@"+postgresHost+"/?sslmode=disable")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,7 +210,7 @@ func TestCreateDriverUsingDBInstance(t *testing.T) {
 		}
 	}()
 
-	db, err := sql.Open("postgres", "postgres://postgres:@"+postgresHost+"/"+database+"?sslmode=disable")
+	db, err := sql.Open("pgx", "postgres://postgres:@"+postgresHost+"/"+database+"?sslmode=disable")
 	if err != nil {
 		t.Fatalf("could not open Postgres connection: %s", err)
 	}
