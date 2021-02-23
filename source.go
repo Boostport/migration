@@ -95,7 +95,7 @@ func (p PackrMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
 
 // PkgerMigrationSource holds the underlying pkger and dir info
 type PkgerMigrationSource struct {
-	// The path in to use
+	// The path to use
 	Dir string
 }
 
