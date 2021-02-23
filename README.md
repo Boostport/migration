@@ -99,15 +99,27 @@ END
 
 ## Embedding migration files
 
-### Using [pkger](https://github.com/markbates/pkger)
-This is the recommended method for embedding migration files as the author of packr has announced he will be focusing his
-efforts on pkger.
+### Using [go:embed](https://golang.org/pkg/embed/) (Recommended for Go 1.16+)
+This is the recommended method for embedding migration files if you are using Go 1.16+. The `go:embed` Go's built-in
+method to embed files into the built binary and does not require any external tools.
 
+Assuming your migration files are in `migrations/`, initialize a `EmbededSource`:
+```go
+//go:embed migrations
+var embedFS embed.FS
+
+assetMigration := &migration.EmbedSource{
+    EmbedFS: embedFS,
+    Dir:     "migrations",
+}
+```
+
+### Using [pkger](https://github.com/markbates/pkger)
 Assuming your migration files are in Assuming your migration files are in `migrations/`, initialize `pkger` and a `PkgerMigrationSource`:
 ```go
 dir := pkger.Include("/test-migrations") // Remember to include forward slash at the beginning of the directory's name
 
-pkgerSource := &PkgerMigrationSource{
+pkgerSource := &migration.PkgerMigrationSource{
     Dir: dir,
 }
 ```
