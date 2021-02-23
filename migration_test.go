@@ -1,15 +1,9 @@
 package migration
 
 import (
-	"errors"
 	"reflect"
 	"sort"
-	"strings"
 	"testing"
-
-	"github.com/Boostport/migration/parser"
-	"github.com/gobuffalo/packr/v2"
-	"github.com/markbates/pkger"
 )
 
 func TestDirectionString(t *testing.T) {
@@ -22,65 +16,6 @@ func TestDirectionString(t *testing.T) {
 	var Other Direction = -1
 	if Other.String() != "directionless" {
 		t.Errorf("Expect `Other` to be 'directionless', got '%s'", Other.String())
-	}
-}
-
-type mockDriver struct {
-	applied []string
-}
-
-func (m *mockDriver) Close() error {
-	return nil
-}
-
-func (m *mockDriver) Migrate(migration *PlannedMigration) error {
-	var migrationStatements *parser.ParsedMigration
-
-	if migration.Direction == Up {
-		migrationStatements = migration.Up
-	} else {
-		migrationStatements = migration.Down
-	}
-
-	errStatement := ""
-
-	if len(migrationStatements.Statements) > 0 {
-		errStatement = migrationStatements.Statements[0]
-	}
-
-	if strings.Contains(errStatement, "error") {
-		return errors.New("error executing migration")
-	}
-
-	versionIndex := -1
-
-	for i, version := range m.applied {
-		if version == migration.ID {
-			versionIndex = i
-			break
-		}
-	}
-
-	if migration.Direction == Up {
-		if versionIndex == -1 {
-			m.applied = append(m.applied, migration.ID)
-		}
-	} else {
-		if versionIndex != -1 {
-			m.applied = append(m.applied[:versionIndex], m.applied[versionIndex+1:]...)
-		}
-	}
-
-	return nil
-}
-
-func (m *mockDriver) Versions() ([]string, error) {
-	return m.applied, nil
-}
-
-func getMockDriver() *mockDriver {
-	return &mockDriver{
-		applied: []string{},
 	}
 }
 
@@ -181,84 +116,6 @@ func TestMigrationSortingWithNonNumericIds(t *testing.T) {
 
 	if !reflect.DeepEqual(unsorted, sorted) {
 		t.Error("Sorted migrations are not in the correct order.")
-	}
-}
-
-func TestGobinDataMigrationSource(t *testing.T) {
-	assetMigration := &GoBindataMigrationSource{
-		Asset:    Asset,
-		AssetDir: AssetDir,
-		Dir:      "test-migrations",
-	}
-
-	driver := getMockDriver()
-	applied, err := Migrate(driver, assetMigration, Up, 0)
-	if err != nil {
-		t.Errorf("Unexpected error while performing go-bindata migration: %s", err)
-	}
-	if applied != 3 {
-		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
-	}
-	if len(driver.applied) != 3 {
-		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
-	}
-}
-
-func TestPackrMigrationSource(t *testing.T) {
-	assetMigration := &PackrMigrationSource{
-		Box: packr.New("migrations", "."),
-		Dir: "test-migrations",
-	}
-
-	driver := getMockDriver()
-	applied, err := Migrate(driver, assetMigration, Up, 0)
-	if err != nil {
-		t.Errorf("Unexpected error while performing packr migration: %s", err)
-	}
-	if applied != 3 {
-		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
-	}
-	if len(driver.applied) != 3 {
-		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
-	}
-}
-
-func TestPackrMigrationSourceWithoutDir(t *testing.T) {
-	assetMigration := &PackrMigrationSource{
-		Box: packr.New("test-migrations", "test-migrations"),
-	}
-
-	driver := getMockDriver()
-	applied, err := Migrate(driver, assetMigration, Up, 0)
-	if err != nil {
-		t.Errorf("Unexpected error while performing packr migration: %s", err)
-	}
-	if applied != 3 {
-		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
-	}
-	if len(driver.applied) != 3 {
-		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
-	}
-}
-
-func TestPkgerMigrationSource(t *testing.T) {
-
-	dir := pkger.Include("/test-migrations")
-
-	assetMigration := &PkgerMigrationSource{
-		Dir: dir,
-	}
-
-	driver := getMockDriver()
-	applied, err := Migrate(driver, assetMigration, Up, 0)
-	if err != nil {
-		t.Errorf("Unexpected error while performing packr migration: %s", err)
-	}
-	if applied != 3 {
-		t.Errorf("Expected %d migrations to be applied, %d applied.", 3, applied)
-	}
-	if len(driver.applied) != 3 {
-		t.Errorf("Applied %d migrations, but driver is showing %d applied.", applied, len(driver.applied))
 	}
 }
 
