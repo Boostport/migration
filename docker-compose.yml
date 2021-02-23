@@ -2,7 +2,7 @@ version: '3'
 
 services:
   dev:
-    image: golang:1.15-alpine
+    image: golang:1.16-alpine
     working_dir: /source
     command: >
       sh -c "apk --no-cache --no-progress add gcc git musl-dev;
@@ -34,7 +34,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
 
   lint:
-    image: golang:1.15-alpine
+    image: golang:1.16-alpine
     working_dir: /source
     command: >
       sh -c "apk --no-cache --no-progress add gcc git make musl-dev;
@@ -45,7 +45,7 @@ services:
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
 
   update-test-bindata:
-    image: golang:1.15-alpine
+    image: golang:1.16-alpine
     working_dir: /source
     command: >
       sh -c "apk --no-cache --no-progress add gcc git musl-dev;
