@@ -22,20 +22,22 @@ Simple and pragmatic migrations for Go applications.
 ## Quickstart
 ```go
 // Create migration source
-dir := pkger.Include("/migrations") // Remember to include forward slash at the beginning of the directory's name
+//go:embed migrations
+var embedFS embed.FS
 
-packrSource := &migration.PkgerMigrationSource{
-    Dir: dir,
+embedSource := &migration.EmbedSource{
+    EmbedFS: embedFS,
+    Dir:     "migrations",
 }
 
 // Create driver
 driver, err := mysql.New("root:@tcp(localhost)/mydatabase?multiStatements=true")
 
 // Run all up migrations
-applied, err := Migrate(driver, packrSource, migration.Up, 0)
+applied, err := Migrate(driver, embedSource, migration.Up, 0)
 
 // Remove the last 2 migrations
-applied, err := Migrate(driver, packrSource, migration.Down, 2)
+applied, err := Migrate(driver, embedSource, migration.Down, 2)
 ```
 
 ## Writing migrations
