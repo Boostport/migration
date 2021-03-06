@@ -25,19 +25,19 @@ Simple and pragmatic migrations for Go applications.
 //go:embed migrations
 var embedFS embed.FS
 
-embedSource := &migration.EmbedSource{
-    EmbedFS: embedFS,
-    Dir:     "migrations",
+embedSource := &migration.EmbedMigrationSource{
+	EmbedFS: embedFS,
+	Dir:     "migrations",
 }
 
 // Create driver
 driver, err := mysql.New("root:@tcp(localhost)/mydatabase?multiStatements=true")
 
 // Run all up migrations
-applied, err := Migrate(driver, embedSource, migration.Up, 0)
+applied, err := migration.Migrate(driver, embedSource, migration.Up, 0)
 
 // Remove the last 2 migrations
-applied, err := Migrate(driver, embedSource, migration.Down, 2)
+applied, err := migration.Migrate(driver, embedSource, migration.Down, 2)
 ```
 
 ## Writing migrations
