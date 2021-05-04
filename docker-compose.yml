@@ -2,11 +2,10 @@ version: '3'
 
 services:
   dev:
-    image: golang:1.16-alpine
+    image: golang:1.16
     working_dir: /source
     command: >
-      sh -c "apk --no-cache --no-progress add gcc git musl-dev;
-             go install github.com/unchartedsoftware/witch;
+      sh -c "go install github.com/unchartedsoftware/witch;
              witch --cmd=\"go test -v -p 1 ./...\" --watch=\"*.mod,**/*.go\""
     environment:
       PHOENIX_HOST: http://phoenix:8765
@@ -34,22 +33,20 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
 
   lint:
-    image: golang:1.16-alpine
+    image: golang:1.16
     working_dir: /source
     command: >
-      sh -c "apk --no-cache --no-progress add gcc git make musl-dev;
-             go install github.com/golangci/golangci-lint/cmd/golangci-lint;
+      sh -c "go install github.com/golangci/golangci-lint/cmd/golangci-lint;
              make sanity-check"
     volumes:
       - .:/source
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
 
   update-test-bindata:
-    image: golang:1.16-alpine
+    image: golang:1.16
     working_dir: /source
     command: >
-      sh -c "apk --no-cache --no-progress add gcc git musl-dev;
-             go install github.com/go-bindata/go-bindata/v3/go-bindata;
+      sh -c "go install github.com/go-bindata/go-bindata/v3/go-bindata;
              go-bindata -o bindata_test.go -pkg migration test-migrations/;
              echo \"go-bindata test data generated.\""
     volumes:

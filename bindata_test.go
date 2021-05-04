@@ -98,7 +98,7 @@ func testMigrations1_initDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/1_init.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1557999818, 0)}
+	info := bindataFileInfo{name: "test-migrations/1_init.down.sql", size: 0, mode: os.FileMode(420), modTime: time.Unix(1616560623, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -118,7 +118,7 @@ func testMigrations1_initUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/1_init.up.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1557999818, 0)}
+	info := bindataFileInfo{name: "test-migrations/1_init.up.sql", size: 0, mode: os.FileMode(420), modTime: time.Unix(1616560623, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -138,7 +138,7 @@ func testMigrations2_updateDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/2_update.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1557999818, 0)}
+	info := bindataFileInfo{name: "test-migrations/2_update.down.sql", size: 0, mode: os.FileMode(420), modTime: time.Unix(1616560623, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -158,7 +158,7 @@ func testMigrations2_updateUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/2_update.up.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1557999818, 0)}
+	info := bindataFileInfo{name: "test-migrations/2_update.up.sql", size: 0, mode: os.FileMode(420), modTime: time.Unix(1616560623, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -178,7 +178,7 @@ func testMigrations3_add_columnDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/3_add_column.down.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1557999818, 0)}
+	info := bindataFileInfo{name: "test-migrations/3_add_column.down.sql", size: 0, mode: os.FileMode(420), modTime: time.Unix(1616560623, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -198,7 +198,7 @@ func testMigrations3_add_columnUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "test-migrations/3_add_column.up.sql", size: 0, mode: os.FileMode(438), modTime: time.Unix(1557999818, 0)}
+	info := bindataFileInfo{name: "test-migrations/3_add_column.up.sql", size: 0, mode: os.FileMode(420), modTime: time.Unix(1616560623, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
