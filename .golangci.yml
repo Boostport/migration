@@ -6,9 +6,9 @@ linters:
   - errcheck
   - gocritic
   - goimports
-  - golint
   - govet
   - megacheck
+  - revive
 
   disable-all: true
 
