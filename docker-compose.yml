@@ -5,7 +5,7 @@ services:
     image: golang:1.17
     working_dir: /source
     command: >
-      sh -c "go install github.com/unchartedsoftware/witch;
+      sh -c "go install github.com/unchartedsoftware/witch@0.2.10;
              witch --cmd=\"go test -v -p 1 ./...\" --watch=\"*.mod,**/*.go\""
     environment:
       PHOENIX_HOST: http://phoenix:8765
@@ -36,7 +36,7 @@ services:
     image: golang:1.17
     working_dir: /source
     command: >
-      sh -c "go install github.com/golangci/golangci-lint/cmd/golangci-lint;
+      sh -c "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1;
              make sanity-check"
     volumes:
       - .:/source
@@ -46,7 +46,7 @@ services:
     image: golang:1.17
     working_dir: /source
     command: >
-      sh -c "go install github.com/go-bindata/go-bindata/v3/go-bindata;
+      sh -c "go install github.com/go-bindata/go-bindata/v3/go-bindata@v3.1.3;
              go-bindata -o bindata_test.go -pkg migration test-migrations/;
              echo \"go-bindata test data generated.\""
     volumes:

@@ -43,7 +43,7 @@ jobs:
       - name: Run golangci-lint checks
         run: |
           export PATH=$PATH:$(go env GOPATH)/bin
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.41.1
           make sanity-check
       - name: Run tests
         env:
