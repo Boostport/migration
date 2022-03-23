@@ -2,9 +2,9 @@ module github.com/Boostport/migration/driver/golang
 
 go 1.18
 
-replace github.com/Boostport/migration => ../..
+require github.com/Boostport/migration v1.0.0
 
-require github.com/Boostport/migration v0.0.0-00010101000000-000000000000
+replace github.com/Boostport/migration => ../..
 
 require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect

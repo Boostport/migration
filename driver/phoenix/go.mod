@@ -3,7 +3,7 @@ module github.com/Boostport/migration/driver/phoenix
 go 1.18
 
 require (
-	github.com/Boostport/migration v0.0.0-00010101000000-000000000000
+	github.com/Boostport/migration v1.0.0
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/apache/calcite-avatica-go/v5 v5.0.0
 )
