@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -26,6 +27,19 @@ func TestMySQLDriver(t *testing.T) {
 			t.Errorf("unexpected error while closing the mysql connection: %v", err)
 		}
 	}()
+
+	for start := time.Now(); ; {
+
+		err = connection.Ping()
+
+		if err == nil {
+			break
+		}
+
+		if time.Since(start) > 10*time.Second {
+			t.Fatal("Timed out while waiting for MySQL server")
+		}
+	}
 
 	_, err = connection.Exec("CREATE DATABASE IF NOT EXISTS " + database)
 	if err != nil {

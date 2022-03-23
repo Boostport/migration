@@ -7,7 +7,7 @@ import (
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	sqlite3 "github.com/mattn/go-sqlite3"
+	"modernc.org/sqlite"
 )
 
 // Driver is the sqlite migration.Driver implementation
@@ -22,7 +22,7 @@ const sqliteTableName = "schema_migration"
 // The DSN is documented here: https://godoc.org/github.com/mattn/go-sqlite3#SQLiteDriver.Open
 func New(dsn string, useTransactions bool) (m.Driver, error) {
 
-	db, err := sql.Open("sqlite3", dsn)
+	db, err := sql.Open("sqlite", dsn)
 
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func New(dsn string, useTransactions bool) (m.Driver, error) {
 
 // NewFromDB returns a sqlite driver from a sql.db
 func NewFromDB(db *sql.DB) (m.Driver, error) {
-	if _, ok := db.Driver().(*sqlite3.SQLiteDriver); !ok {
+	if _, ok := db.Driver().(*sqlite.Driver); !ok {
 		return nil, errors.New("database instance is not using the postgres driver")
 	}
 

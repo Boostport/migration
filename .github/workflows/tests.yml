@@ -9,9 +9,9 @@ jobs:
     strategy:
       matrix:
         go:
-          - version: 1.17
+          - version: 1.18
             report: true
-          - version: 1.16
+          - version: 1.17
     runs-on: ubuntu-latest
     container:
       image: golang:${{ matrix.go.version }}
@@ -46,16 +46,42 @@ jobs:
           go install github.com/golangci/golangci-lint/cmd/golangci-lint
           make sanity-check
       - name: Run tests
+        if: matrix.go.report != true
         env:
           PHOENIX_HOST: http://phoenix:8765
           MYSQL_HOST: mysql:3306
           POSTGRES_HOST: postgres:5432
         run: |
-          go test -coverprofile c.out -v ./...
-          echo $? > /tmp/GO_EXIT_CODE
+          find . -name go.mod -execdir go test -v ./... ';'
+      - name: Run tests with coverage
+        if: matrix.go.report == true && github.ref == 'refs/heads/main'
+        env:
+          PHOENIX_HOST: http://phoenix:8765
+          MYSQL_HOST: mysql:3306
+          POSTGRES_HOST: postgres:5432
+        run: |
+          echo 0 > /tmp/GO_EXIT_CODE
+          modulesFound=$(find . -name 'go.mod' -type f -exec dirname {} \;)
+          count=0
+          pwd=$(pwd)
+          
+          for mod in $modulesFound; do
+            cd $mod
+            go test -coverprofile c.out -v ./...
+            exitCode=$?
+            if [ $exitCode -ne 0 ]; then echo $exitCode > /tmp/GO_EXIT_CODE; fi
+            /tmp/cc-test-reporter format-coverage -t gocov -o /tmp/coverage/$count.json --prefix $(go list) c.out
+            count=$((count+1))
+            cd $pwd
+          done
+
       - name: Send results to code climate
         if: matrix.go.report == true && github.ref == 'refs/heads/main'
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         run: |
-          /tmp/cc-test-reporter after-build --prefix github.com/$GITHUB_REPOSITORY --exit-code `cat /tmp/GO_EXIT_CODE`
+          exitCode=`cat /tmp/GO_EXIT_CODE`
+          if [ $exitCode -eq 0 ]; then 
+            /tmp/cc-test-reporter sum-coverage /tmp/coverage/*.json -p 6
+            /tmp/cc-test-reporter upload-coverage
+          fi

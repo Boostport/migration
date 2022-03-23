@@ -12,7 +12,7 @@ import (
 	"path"
 )
 
-// EmbedMigrationSource uses a embed.FS that is used to embed files natively in Go 1.16+
+// EmbedMigrationSource uses an embed.FS that is used to embed files natively in Go 1.16+
 type EmbedMigrationSource struct {
 	EmbedFS embed.FS
 

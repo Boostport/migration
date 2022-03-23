@@ -1,11 +1,10 @@
-module github.com/Boostport/migration
+module github.com/Boostport/migration/driver/golang
 
 go 1.18
 
-require (
-	github.com/golangci/golangci-lint v1.45.0
-	github.com/unchartedsoftware/witch v0.0.0-20200617171400-4f405404126f
-)
+replace github.com/Boostport/migration => ../..
+
+require github.com/Boostport/migration v0.0.0-00010101000000-000000000000
 
 require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect
@@ -55,6 +54,7 @@ require (
 	github.com/golangci/dupl v0.0.0-20180902072040-3e9179ac440a // indirect
 	github.com/golangci/go-misc v0.0.0-20180628070357-927a3d87b613 // indirect
 	github.com/golangci/gofmt v0.0.0-20190930125516-244bba706f1a // indirect
+	github.com/golangci/golangci-lint v1.45.0 // indirect
 	github.com/golangci/lint-1 v0.0.0-20191013205115-297bf364a8e0 // indirect
 	github.com/golangci/maligned v0.0.0-20180506175553-b1d89398deca // indirect
 	github.com/golangci/misspell v0.3.5 // indirect
@@ -142,6 +142,7 @@ require (
 	github.com/tommy-muehle/go-mnd/v2 v2.5.0 // indirect
 	github.com/ultraware/funlen v0.0.3 // indirect
 	github.com/ultraware/whitespace v0.0.5 // indirect
+	github.com/unchartedsoftware/witch v0.0.0-20200617171400-4f405404126f // indirect
 	github.com/urfave/cli v1.22.4 // indirect
 	github.com/uudashr/gocognit v1.0.5 // indirect
 	github.com/yagipy/maintidx v1.0.0 // indirect

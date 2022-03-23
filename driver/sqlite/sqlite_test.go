@@ -7,8 +7,8 @@ import (
 
 	"github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	sqlmock "github.com/DATA-DOG/go-sqlmock"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/DATA-DOG/go-sqlmock"
+	_ "modernc.org/sqlite"
 )
 
 func TestSQLiteDriver(t *testing.T) {
@@ -87,7 +87,7 @@ func TestSQLiteDriver(t *testing.T) {
 		}
 
 		if _, err := driver.(*Driver).db.Exec("INSERT INTO test_table2 (id) values (1)"); err != nil {
-			reg := regexp.MustCompile(`^no such table: .+`)
+			reg := regexp.MustCompile(`^SQL logic error: no such table: .+`)
 
 			if !reg.MatchString(err.Error()) {
 				t.Errorf("received an error while inserting into a non-existent table, but it was not a undefined_table error: %s", err)
@@ -149,7 +149,7 @@ func TestCreateDriverUsingInvalidDBInstance(t *testing.T) {
 }
 
 func TestCreateDriverUsingDBInstance(t *testing.T) {
-	db, err := sql.Open("sqlite3", "file::memory:?cache=shared&_busy_timeout=50000")
+	db, err := sql.Open("sqlite", "file::memory:?cache=shared&_busy_timeout=50000")
 	if err != nil {
 		t.Fatal(err)
 	}

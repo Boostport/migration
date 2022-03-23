@@ -2,11 +2,11 @@ version: '3'
 
 services:
   dev:
-    image: golang:1.17
+    image: golang:1.18
     working_dir: /source
     command: >
       sh -c "go install github.com/unchartedsoftware/witch;
-             witch --cmd=\"go test -v -p 1 ./...\" --watch=\"*.mod,**/*.go\""
+             witch --cmd=\"find . -name go.mod -execdir go test -v ./... '\;'\" --watch=\"*.mod,**/*.go\""
     environment:
       PHOENIX_HOST: http://phoenix:8765
       MYSQL_HOST: mysql:3306
@@ -28,27 +28,16 @@ services:
     image: boostport/hbase-phoenix-all-in-one:2.0-5.0
 
   postgres:
-    image: postgres:13-alpine
+    image: postgres:14-alpine
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
 
   lint:
-    image: golang:1.17
+    image: golang:1.18
     working_dir: /source
     command: >
       sh -c "go install github.com/golangci/golangci-lint/cmd/golangci-lint;
              make sanity-check"
-    volumes:
-      - .:/source
-      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
-
-  update-test-bindata:
-    image: golang:1.17
-    working_dir: /source
-    command: >
-      sh -c "go install github.com/go-bindata/go-bindata/v3/go-bindata;
-             go-bindata -o bindata_test.go -pkg migration test-migrations/;
-             echo \"go-bindata test data generated.\""
     volumes:
       - .:/source
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache

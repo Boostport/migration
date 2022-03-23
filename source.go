@@ -1,130 +1,16 @@
 package migration
 
 import (
-	"bytes"
 	"fmt"
 	"io"
-	"os"
-	"path"
 	"strings"
 	"sync"
-
-	"github.com/markbates/pkger"
 )
 
 // Source is an interface that defines how a source can find and read migration files.
 type Source interface {
 	ListMigrationFiles() ([]string, error)
 	GetMigrationFile(file string) (io.Reader, error)
-}
-
-// GoBindataMigrationSource is a MigrationSource that uses migration files embedded in a Go application using go-bindata.
-type GoBindataMigrationSource struct {
-	// Asset should return content of file in path if exists
-	Asset func(path string) ([]byte, error)
-
-	// AssetDir should return list of files in the path
-	AssetDir func(path string) ([]string, error)
-
-	// Path in the bindata to use.
-	Dir string
-}
-
-// ListMigrationFiles returns a list of gobindata migration files
-func (a GoBindataMigrationSource) ListMigrationFiles() ([]string, error) {
-	return a.AssetDir(a.Dir)
-}
-
-// GetMigrationFile gets a gobindata migration file
-func (a GoBindataMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
-	file, err := a.Asset(path.Join(a.Dir, name))
-	if err != nil {
-		return nil, err
-	}
-
-	return bytes.NewReader(file), nil
-}
-
-// PackrBox avoids pulling in the packr library for everyone, mimics the bits of
-// packr.Box that we need.
-type PackrBox interface {
-	List() []string
-	Find(name string) ([]byte, error)
-}
-
-// PackrMigrationSource holds the box and dir info
-type PackrMigrationSource struct {
-	Box PackrBox
-
-	// The path in the packr box to use
-	Dir string
-}
-
-// ListMigrationFiles returns a list of packr migration files
-func (p PackrMigrationSource) ListMigrationFiles() ([]string, error) {
-	files := p.Box.List()
-	var migrations []string
-	prefix := ""
-
-	dir := path.Clean(p.Dir)
-	if dir != "." {
-		prefix = fmt.Sprintf("%s/", dir)
-	}
-
-	for _, file := range files {
-		if !strings.HasPrefix(file, prefix) {
-			continue
-		}
-		name := strings.TrimPrefix(file, prefix)
-		if strings.Contains(name, "/") {
-			continue
-		}
-
-		migrations = append(migrations, name)
-	}
-
-	return migrations, nil
-}
-
-// GetMigrationFile gets a packr migration file
-func (p PackrMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
-	file, err := p.Box.Find(path.Join(p.Dir, name))
-
-	return bytes.NewReader(file), err
-}
-
-// PkgerMigrationSource holds the underlying pkger and dir info
-type PkgerMigrationSource struct {
-	// The path to use
-	Dir string
-}
-
-// ListMigrationFiles returns a list of pkger migration files
-func (p PkgerMigrationSource) ListMigrationFiles() ([]string, error) {
-
-	var migrations []string
-
-	err := pkger.Walk(p.Dir, func(path string, info os.FileInfo, err error) error {
-
-		if info.IsDir() {
-			return nil
-		}
-
-		migrations = append(migrations, info.Name())
-
-		return nil
-	})
-
-	if err != nil {
-		return migrations, fmt.Errorf("error listing migration files: %s", err)
-	}
-
-	return migrations, nil
-}
-
-// GetMigrationFile gets a pkger migration file
-func (p PkgerMigrationSource) GetMigrationFile(name string) (io.Reader, error) {
-	return pkger.Open(path.Join(p.Dir, name))
 }
 
 // GolangMigrationSource implements migration.Source
