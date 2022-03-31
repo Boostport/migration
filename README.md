@@ -27,7 +27,7 @@ Each driver is implemented in its own module to avoid pulling in unused dependen
 ```go
 import (
     "github.com/Boostport/migration"
-	"github.com/Boostport/migration/drivers/mysql"
+    "github.com/Boostport/migration/drivers/mysql"
 )
 
 // Create migration source
