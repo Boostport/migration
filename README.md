@@ -198,15 +198,14 @@ changes.
 
 ## Contributing
 We automatically run some linters using [golangci-lint](https://github.com/golangci/golangci-lint) to check code quality
-before merging it. This is executed using a [Makefile](Makefile) target. 
+before merging it.
 
 You should run and ensure all the checks pass locally before submitting a pull request. The version of
-[golangci-lint](https://github.com/golangci/golangci-lint) to be used is pinned in `go.mod`.
+[golangci-lint](https://github.com/golangci/golangci-lint) to be used is pinned in `docker-compose.yml`.
 
 To execute the linters:
-1. Install `make`.
-2. Install [golangci-lint](https://github.com/golangci/golangci-lint) by executing `go install github.com/golangci/golangci-lint/cmd/golangci-lint`.
-3. Execute `make sanity-check`.
+1. Install docker.
+2. Execute `docker compose run lint`.
 
 ## License
 This library is licensed under the Apache 2 License.

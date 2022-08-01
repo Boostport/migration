@@ -1,12 +1,10 @@
 version: '3'
 
 services:
-  dev:
-    image: golang:1.18
+  test:
+    image: golang:${GO_VERSION:-1.18}
     working_dir: /source
-    command: >
-      sh -c "go install github.com/unchartedsoftware/witch;
-             witch --cmd=\"find . -name go.mod -execdir go test -v ./... '\;'\" --watch=\"*.mod,**/*.go\""
+    command: sh -c "find . -name 'go.mod' -printf '%h\\n' | xargs -L1 sh -c 'cd $$0 && go test -coverprofile c.out -v ./...'"
     environment:
       PHOENIX_HOST: http://phoenix:8765
       MYSQL_HOST: mysql:3306
@@ -33,11 +31,9 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
 
   lint:
-    image: golang:1.18
+    image: golangci/golangci-lint:v1.47.2
     working_dir: /source
-    command: >
-      sh -c "go install github.com/golangci/golangci-lint/cmd/golangci-lint;
-             make sanity-check"
+    command: golangci-lint run -v
     volumes:
       - .:/source
       - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
