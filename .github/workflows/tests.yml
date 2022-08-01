@@ -26,6 +26,8 @@ jobs:
         run: |
           docker-compose run lint
       - name: Run tests
+        env:
+          GO_VERSION: ${{ matrix.go.version }}
         run: |
           docker-compose run test
           echo $? > /tmp/GO_EXIT_CODE
