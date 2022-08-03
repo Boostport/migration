@@ -17,17 +17,17 @@ Each driver is implemented in its own module to avoid pulling in unused dependen
 
 | Driver                         | Import                                            |
 |:-------------------------------|:--------------------------------------------------|
-| Apache Phoenix                 | `github.com/Boostport/migration/drivers/phoenix`  |
-| Go (runs generic go functions) | `github.com/Boostport/migration/drivers/golang`   |
-| MySQL                          | `github.com/Boostport/migration/drivers/mysql`    |
-| PostgreSQL                     | `github.com/Boostport/migration/drivers/postgres` |
-| SQLite                         | `github.com/Boostport/migration/drivers/sqlite`   |
+| Apache Phoenix                 | `github.com/Boostport/migration/driver/phoenix`  |
+| Go (runs generic go functions) | `github.com/Boostport/migration/driver/golang`   |
+| MySQL                          | `github.com/Boostport/migration/driver/mysql`    |
+| PostgreSQL                     | `github.com/Boostport/migration/driver/postgres` |
+| SQLite                         | `github.com/Boostport/migration/driver/sqlite`   |
 
 ## Quickstart
 ```go
 import (
     "github.com/Boostport/migration"
-    "github.com/Boostport/migration/drivers/mysql"
+    "github.com/Boostport/migration/driver/mysql"
 )
 
 // Create migration source
