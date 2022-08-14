@@ -3,7 +3,7 @@ package migration
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"regexp"
 	"sort"
 	"strconv"
@@ -156,7 +156,7 @@ func getMigrations(migrations Source) ([]*Migration, error) {
 				return m, fmt.Errorf("Error getting migrations: %s", err)
 			}
 
-			contents, err := ioutil.ReadAll(reader)
+			contents, err := io.ReadAll(reader)
 			if err != nil {
 				return m, fmt.Errorf("Error getting migration content: %s", err)
 			}
