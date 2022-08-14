@@ -2,7 +2,7 @@ version: '3'
 
 services:
   test:
-    image: golang:${GO_VERSION:-1.18}
+    image: golang:${GO_VERSION:-1.19}
     working_dir: /source
     command: sh -c "find . -name 'go.mod' -printf '%h\\n' | xargs -L1 sh -c 'cd $$0 && go test -coverprofile c.out -v ./...'"
     environment:
