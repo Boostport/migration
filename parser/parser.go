@@ -1,3 +1,4 @@
+// Package parser provides utilities for parsing migration files.
 package parser
 
 import (

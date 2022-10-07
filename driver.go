@@ -1,3 +1,4 @@
+// Package migration is a simple and pragmatic migration tool for Go.
 package migration
 
 // Driver is the interface type that needs to implemented by all drivers.
