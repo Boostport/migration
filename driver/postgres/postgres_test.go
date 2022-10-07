@@ -10,7 +10,7 @@ import (
 	"github.com/Boostport/migration/parser"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jackc/pgconn"
-	_ "github.com/jackc/pgx/v4/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func TestPostgresDriver(t *testing.T) {

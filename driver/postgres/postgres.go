@@ -7,7 +7,7 @@ import (
 
 	m "github.com/Boostport/migration"
 	"github.com/Boostport/migration/parser"
-	"github.com/jackc/pgx/v4/stdlib"
+	"github.com/jackc/pgx/v5/stdlib"
 )
 
 // Driver is the postgres migration.Driver implementation
